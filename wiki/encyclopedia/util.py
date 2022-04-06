@@ -38,6 +38,20 @@ def get_entry(title):
         return None
 
 
+def format_entry_name(title):
+    """
+    Returns correctly capitalized title. If no such entry, returns None.
+    """
+    title = title.lower()
+    entries = list_entries()
+
+    for entry in entries:
+        if title == entry.lower():
+            return entry
+
+    return None
+
+
 def md_to_html(text):
     text = markdown(text)
 

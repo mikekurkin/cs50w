@@ -1,4 +1,4 @@
-from django.shortcuts import render
+# from django import forms
 from django.http import Http404
 from django.shortcuts import render, redirect
 from django.urls import reverse
@@ -13,6 +13,10 @@ def index(request):
     query: str = request.GET.get("q")
 
     if query is not None:
+        fquery = util.format_entry_name(query)
+        if fquery is not None:
+            return redirect(reverse("entry", args=[fquery]))
+
         entries = filter(lambda x: query.lower() in x.lower(), entries)
 
     return render(request, "encyclopedia/index.html", {
@@ -22,6 +26,13 @@ def index(request):
 
 
 def entry(request, name):
+    fname = util.format_entry_name(name)
+    if fname is None:
+        raise Http404("Page not found")
+
+    if fname != name:
+        return redirect(reverse("entry", args=[fname]))
+
     content = util.get_entry(name)
     if content is None:
         raise Http404("Page not found")
