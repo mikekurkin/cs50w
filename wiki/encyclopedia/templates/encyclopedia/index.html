@@ -5,11 +5,19 @@
 {% endblock %}
 
 {% block body %}
-    <h1>All Pages</h1>
+    <h1>
+        {% if not query %}
+            All Pages
+        {% else %}
+            <a href="/">×</a> Search for: {{ query }}
+        {% endif %}
+    </h1>
 
     <ul>
         {% for entry in entries %}
-            <li>{{ entry }}</li>
+            <li><a href="{% url 'entry' entry %}">{{ entry }}</a></li>
+        {% empty %}
+            No entries
         {% endfor %}
     </ul>
 

@@ -1,0 +1,14 @@
+{% extends "encyclopedia/layout.html" %}
+
+{% block title %}
+    Wiki : {{ entry_title }}
+{% endblock %}
+
+{% block body %}
+    {% comment %} <h1>{{ entry_title }}</h1> {% endcomment %}
+
+    <ul>
+        {{ entry_content | safe }}
+    </ul>
+
+{% endblock %}
