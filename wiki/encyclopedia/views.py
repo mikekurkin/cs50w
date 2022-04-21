@@ -1,4 +1,4 @@
-# from django import forms
+from django import forms
 from django.http import Http404
 from django.shortcuts import render, redirect
 from django.urls import reverse
@@ -6,6 +6,11 @@ from django.urls import reverse
 from random import choice
 
 from . import util
+
+
+class EntryForm(forms.Form):
+    name = forms.CharField(label="", max_length=80)
+    contents = forms.CharField(label="Contents", widget=forms.Textarea)
 
 
 def index(request):
@@ -23,6 +28,26 @@ def index(request):
         "query": query,
         "entries": entries
     })
+
+
+def edit(request, name=None):
+
+    new_entry = True if name is None else False
+
+    data = None
+    if not new_entry:
+        contents = util.get_entry(name)
+        data = {'name': name, 'contents': contents}
+
+    form = EntryForm(data)
+    if not new_entry:
+        form.fields['name'].widget.attrs['readonly'] = True
+
+    return render(request, "encyclopedia/edit.html", {
+        "name": name,
+        "form": form
+    }
+    )
 
 
 def entry(request, name):

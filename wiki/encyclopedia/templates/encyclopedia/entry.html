@@ -4,11 +4,13 @@
     Wiki : {{ entry_title }}
 {% endblock %}
 
-{% block body %}
-    {% comment %} <h1>{{ entry_title }}</h1> {% endcomment %}
+{% block nav %}
+    <a href="{% url 'edit' entry_title %}">Edit This Page</a>
+{% endblock %}
 
-    <ul>
-        {{ entry_content | safe }}
-    </ul>
+{% block body %}
+
+    {{ entry_content | safe }}
+    
 
 {% endblock %}
