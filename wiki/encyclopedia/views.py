@@ -9,8 +9,10 @@ from . import util
 
 
 class EntryForm(forms.Form):
-    name = forms.CharField(label="", max_length=80)
-    contents = forms.CharField(label="Contents", widget=forms.Textarea)
+    name = forms.CharField(label="", max_length=80, widget=forms.TextInput(attrs={'placeholder': "Title"}))
+    contents = forms.CharField(label="", widget=forms.Textarea(attrs={'placeholder': "Contents"}))
+
+    name.widget.attrs['placeholder'] = "Title"
 
 
 def index(request):

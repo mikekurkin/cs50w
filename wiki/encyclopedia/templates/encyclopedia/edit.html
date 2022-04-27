@@ -14,6 +14,7 @@
 
 {% block body %}
     <form id="edit_form">
+        {% csrf_token %}
         {{ form }}
     </form>
 {% endblock %}

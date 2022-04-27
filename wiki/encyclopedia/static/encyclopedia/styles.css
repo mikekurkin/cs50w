@@ -37,6 +37,7 @@ textarea {
     margin-top: 5px;
 }
 
-#edit_form label {
+#edit_form input {
+    margin: 10pt;
     display: block;
 }
