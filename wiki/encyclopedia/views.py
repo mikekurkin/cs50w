@@ -5,11 +5,13 @@ from django.urls import reverse
 
 from random import choice
 
+import re
+
 from . import util
 
 
 class EntryForm(forms.Form):
-    name = forms.CharField(label="", max_length=80, widget=forms.TextInput(attrs={'placeholder': "Title"}))
+    form_name = forms.CharField(label="", max_length=80, widget=forms.TextInput(attrs={'placeholder': "Title"}))
     contents = forms.CharField(label="", widget=forms.Textarea(attrs={'placeholder': "Contents"}))
 
     name.widget.attrs['placeholder'] = "Title"
@@ -20,7 +22,7 @@ def index(request):
     query: str = request.GET.get("q")
 
     if query is not None:
-        fquery = util.format_entry_name(query)
+        fquery = util.get_formatted_name(query)
         if fquery is not None:
             return redirect(reverse("entry", args=[fquery]))
 
@@ -53,7 +55,7 @@ def edit(request, name=None):
 
 
 def entry(request, name):
-    fname = util.format_entry_name(name)
+    fname = util.get_formatted_name(name)
     if fname is None:
         raise Http404("Page not found")
 

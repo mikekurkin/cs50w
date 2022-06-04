@@ -38,7 +38,7 @@ def get_entry(title):
         return None
 
 
-def format_entry_name(title):
+def get_formatted_name(title):
     """
     Returns correctly capitalized title. If no such entry, returns None.
     """
