@@ -86,8 +86,11 @@ def entry(request, name):
         return redirect(reverse("entry", args=[fname]))
 
     content = util.get_entry(name)
-    if content is None:
-        raise Http404("Page not found")
+
+    match = re.search(rf'^\s*#\s*{fname}\s*$', content, flags=re.MULTILINE|re.IGNORECASE)
+
+    if not match:
+        content = f"# {fname}\n\n" + content
 
     content = util.md_to_html(content)
 
