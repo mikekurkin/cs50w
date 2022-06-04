@@ -9,12 +9,13 @@ code {
 
 h1 {
     margin-top: 0px;
-    padding-top: 20px;
+    padding: 21px 10px 10px 23px;
 }
 
 textarea {
-    height: 90vh;
-    width: 80%;
+    height: 85vh;
+    width: 90%;
+    margin-left: 15px;
 }
 
 .main {
@@ -40,4 +41,13 @@ textarea {
 #edit_form input {
     margin: 10pt;
     display: block;
+}
+
+#id_form_name {
+    margin: 0px;
+    font-size: 40px;
+    font-weight: 500;
+    border-width: 0px 0px 2px 0px;
+    padding-left: 10px;
+    padding-right: 10px;
 }
