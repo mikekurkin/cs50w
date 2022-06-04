@@ -1,5 +1,4 @@
 from django import forms
-from django.http import Http404
 from django.shortcuts import render, redirect
 from django.urls import reverse
 
@@ -13,8 +12,6 @@ from . import util
 class EntryForm(forms.Form):
     form_name = forms.CharField(label="", max_length=80, widget=forms.TextInput(attrs={'placeholder': "Title"}))
     contents = forms.CharField(label="", widget=forms.Textarea(attrs={'placeholder': "Contents"}))
-
-    name.widget.attrs['placeholder'] = "Title"
 
 
 def index(request):
@@ -34,18 +31,44 @@ def index(request):
     })
 
 
-def edit(request, name=None):
+def render_error(request, status=500, text=None):
+    # content = str(status) if text is None else str(status) + ": " + text
+    return render(request, "encyclopedia/error.html", {
+        "status": status,
+        "text": text
+    }, status=status)
 
-    new_entry = True if name is None else False
+
+def edit(request, name=None):
+    new_entry = name is None
+
+    if request.method == 'POST':
+        form = EntryForm(request.POST)
+
+        if not form.is_valid():
+            return render(request, "encyclopedia/edit.html", {
+                "name": name,
+                "form": form
+            })
+            
+        form_name = form.cleaned_data['form_name']
+        contents = form.cleaned_data['contents']
+
+        if new_entry and (fname := util.get_formatted_name(form_name)):
+            return render_error(request, 409, f'Entry "{fname}" already exists')
+
+        util.save_entry(form_name, contents)
+        return redirect(reverse("entry", args=[form_name]))
 
     data = None
     if not new_entry:
         contents = util.get_entry(name)
-        data = {'name': name, 'contents': contents}
+        data = {'form_name': name, 'contents': contents}
 
     form = EntryForm(data)
+
     if not new_entry:
-        form.fields['name'].widget.attrs['readonly'] = True
+        form.fields['form_name'].widget.attrs['readonly'] = True
 
     return render(request, "encyclopedia/edit.html", {
         "name": name,
@@ -57,7 +80,7 @@ def edit(request, name=None):
 def entry(request, name):
     fname = util.get_formatted_name(name)
     if fname is None:
-        raise Http404("Page not found")
+        return render_error(request, 404, f'Entry "{name}" not found')
 
     if fname != name:
         return redirect(reverse("entry", args=[fname]))

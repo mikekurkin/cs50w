@@ -9,12 +9,20 @@
 {% endblock %}
 
 {% block nav %}
-<a href="#">Save This Page</a>
+<input type="submit" form="edit_form" value="Save This Page"/>
 {% endblock %}
 
 {% block body %}
-    <form id="edit_form">
+    {% if name %}
+        <form id="edit_form" action="{% url 'edit' name %}" method="post">
+    {% else %}
+        <form id="edit_form" action="{% url 'new' %}" method="post">
+    {% endif %}
         {% csrf_token %}
+        {% if name %}
+        <input name="name" value="{{ name }}" type="hidden">
+        {% endif %}
         {{ form }}
+
     </form>
 {% endblock %}
