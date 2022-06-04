@@ -32,7 +32,6 @@ def index(request):
 
 
 def render_error(request, status=500, text=None):
-    # content = str(status) if text is None else str(status) + ": " + text
     return render(request, "encyclopedia/error.html", {
         "status": status,
         "text": text
@@ -45,30 +44,41 @@ def edit(request, name=None):
     if request.method == 'POST':
         form = EntryForm(request.POST)
 
+        # If form not valid, re-render
         if not form.is_valid():
             return render(request, "encyclopedia/edit.html", {
                 "name": name,
                 "form": form
             })
-            
+
         form_name = form.cleaned_data['form_name']
         contents = form.cleaned_data['contents']
 
+        # Do not allow owerwriting entry if one with such name exists
         if new_entry and (fname := util.get_formatted_name(form_name)):
             return render_error(request, 409, f'Entry "{fname}" already exists')
 
-        util.save_entry(form_name, contents)
-        return redirect(reverse("entry", args=[form_name]))
+        # If editing existing entry, save based on original name.
+        # The name in form is only used for new entries.
+        if new_entry:
+            name = form_name
+        util.save_entry(name, contents)
+
+        # Redirect to entry after saving
+        return redirect(reverse("entry", args=[name]))
 
     data = None
+
+    # Populate form if editing existing entry
     if not new_entry:
         contents = util.get_entry(name)
         data = {'form_name': name, 'contents': contents}
+        form = EntryForm(data)
 
-    form = EntryForm(data)
-
-    if not new_entry:
+        # Do not allow editing the title for existing entries
         form.fields['form_name'].widget.attrs['readonly'] = True
+    else:
+        form = EntryForm(data)
 
     return render(request, "encyclopedia/edit.html", {
         "name": name,
@@ -87,8 +97,9 @@ def entry(request, name):
 
     content = util.get_entry(name)
 
-    match = re.search(rf'^\s*#\s*{fname}\s*$', content, flags=re.MULTILINE|re.IGNORECASE)
-
+    # If heading with entry name does not appear somewhere in the contents,
+    # prepend the contents with such heading
+    match = re.search(rf'^\s*#\s*{fname}\s*$', content, flags=re.MULTILINE | re.IGNORECASE)
     if not match:
         content = f"# {fname}\n\n" + content
 

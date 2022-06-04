@@ -40,7 +40,7 @@ def get_entry(title):
 
 def get_formatted_name(title):
     """
-    Returns correctly capitalized title. If no such entry, returns None.
+    Returns correctly capitalized title (as in file name). If no such entry, returns None.
     """
     title = title.lower()
     entries = list_entries()
@@ -53,6 +53,9 @@ def get_formatted_name(title):
 
 
 def md_to_html(text):
+    """
+    Converts Markdown paragraph to HTML.
+    """
     text = markdown(text)
 
     return text
