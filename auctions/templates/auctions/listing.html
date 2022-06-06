@@ -1,0 +1,29 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <h2>
+        {{ listing.title }}
+    </h2>
+
+    <h3>
+        $ {{ listing.st_bid | floatformat:2 }}
+    </h3>
+
+    
+    {% if listing.image_url %}
+    <div class="listing_image">
+        <img src="{{ listing.image_url }}" />
+    </div>
+    {% endif %}
+
+    <h3>
+        {% if listing.is_active %}
+            Active
+        {% else %}
+            Inactive
+        {% endif %}
+    </h3>
+
+    <div class="listing_descr">{{ listing.description }}</div>
+    
+{% endblock %}

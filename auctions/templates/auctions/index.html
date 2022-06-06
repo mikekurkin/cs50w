@@ -3,7 +3,13 @@
 {% block index-active %}nav-active{% endblock %}
 
 {% block body %}
-    <h2>Active Listings</h2>
+  <h2>Active Listings</h2>
 
-    TODO
+  <ul>
+  {% for listing in listings %}
+    <li><a href="{% url 'listing' listing.id %}">{{ listing }}</a></li>
+  {% empty %}
+    No active listings
+  {% endfor %}
+  </ul>
 {% endblock %}

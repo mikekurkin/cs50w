@@ -1,0 +1,31 @@
+{% extends "auctions/layout.html" %}
+
+{% block listing-new-active %}nav-active{% endblock %}
+
+{% block body %}
+    <form action="{% url 'listing_new' %}" method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <input autofocus class="form-control" required type="text" name="title" placeholder="Title" value="{{ listing.title }}" >
+        </div>
+        <div class="form-group">
+            <input class="form-control" required type="number" step="0.01" name="st_bid" placeholder="Starting Bid (USD)" value="{{ listing.st_bid | floatformat:2 }}" >
+        </div>
+        <div class="form-group">
+            <textarea rows="6" required class="form-control" type="text" name="description" placeholder="Description">{{ listing.description }}</textarea>
+        </div>
+        <div class="form-group">
+            <input class="form-control" type="text" name="image_url" placeholder="Image URL (optional)" value="{% if listing.image_url is not None %}{{ listing.image_url }}{% endif %}" >
+        </div>
+        <div class="form-group">
+            <select class="form-control" type="text" name="category" default="">
+                <option value disabled selected hidden>Category (optional)</option>
+                <option value default>None</option>
+                {% for category in categories %}
+                <option  value="{{ category.id }}" >{{ category }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <input class="btn btn-primary" type="submit" value="Create">
+    </form>
+{% endblock %}
