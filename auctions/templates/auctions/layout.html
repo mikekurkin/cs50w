@@ -18,7 +18,9 @@
         </div>
         <ul class="nav">
             <li class="nav-item">
-                <a class="nav-link" href="{% url 'index' %}">Active Listings</a>
+                <a href="{% url 'index' %}" class="nav-link {% block index-active %}{% endblock %}">
+                    Active Listings
+                </a>
             </li>
             {% if user.is_authenticated %}
                 <li class="nav-item">
@@ -26,10 +28,10 @@
                 </li>
             {% else %}
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'login' %}">Log In</a>
+                    <a href="{% url 'login' %}" class="nav-link {% block login-active %}{% endblock %}">Log In</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'register' %}">Register</a>
+                    <a href="{% url 'register' %}" class="nav-link {% block register-active %}{% endblock %}">Register</a>
                 </li>
             {% endif %}
         </ul>

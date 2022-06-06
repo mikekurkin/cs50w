@@ -1,3 +1,14 @@
 body {
     padding: 10px;
 }
+
+a.nav-active {
+    border-bottom-width: 2px;
+    color: #444;
+    pointer-events: none;
+    cursor: default;
+}
+
+.listing_descr {
+    white-space: pre;
+}
