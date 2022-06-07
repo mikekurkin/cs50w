@@ -5,7 +5,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 
-from .models import User, Listing, Category
+from .models import User, Listing, Category, Bid
 
 
 def index(request):
@@ -27,18 +27,27 @@ def listing_new(request):
     if request.method == "POST":
         title = request.POST.get("title")
         description = request.POST.get("description")
-        st_bid = float(request.POST.get("st_bid"))
+        st_bid_amount = float(request.POST.get("st_bid"))
         image_url = request.POST.get("image_url")
         if image_url == "":
             image_url = None
         category = request.POST.get("category")
         if category is not None:
             category = int(category)
-        creator = request.user
+        seller = request.user
 
-        listing = Listing(title=title, description=description, st_bid=st_bid, image_url=image_url,
-                          category=category, creator=creator, is_active=True)
+        listing = Listing(title=title, description=description, image_url=image_url,
+                          category=category, seller=seller, is_active=True)
+        print(listing.pk)
         listing.save()
+        print(listing.pk)
+
+        st_bid = Bid(bid_listing=listing, bidder=seller, amount=st_bid_amount)
+        st_bid.save()
+        
+        listing.st_bid = st_bid
+        listing.save()
+        
         return HttpResponseRedirect(reverse("listing", args=(listing.pk,)))
 
     listing = Listing()

@@ -6,7 +6,7 @@
     </h2>
 
     <h3>
-        $ {{ listing.st_bid | floatformat:2 }}
+        $ {{ listing.st_bid.amount | floatformat:2 }}
     </h3>
 
     
@@ -20,7 +20,7 @@
         {% if listing.is_active %}
             Active
         {% else %}
-            Inactive
+            Closed
         {% endif %}
     </h3>
 
