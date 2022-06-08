@@ -1,6 +1,10 @@
 {% extends "auctions/layout.html" %}
 
 {% block body %}
+    {% if message %}
+        <div>{{ message }}</div>
+    {% endif %}
+
     <h2>
         {{ listing.title }}
     </h2>
@@ -8,7 +12,12 @@
         <h3>
             {% if listing.is_active %}
                 Active
-        $ {{ listing.st_bid | floatformat:2 }}
+                {% if user == listing.seller %}
+                    <form action="{% url 'listing_close' listing.pk %}" method="post">
+                        {% csrf_token %}
+                        <input class="btn btn-danger" type="submit" value="Close">
+                    </form>
+                {% endif %}
             {% else %}
                 Closed
             {% endif %}

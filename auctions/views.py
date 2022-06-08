@@ -1,3 +1,4 @@
+import re
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
@@ -21,6 +22,18 @@ def listing_show(request, listing_id, message=None):
         "listing": listing,
         "message": message
     })
+
+
+@login_required
+def listing_close(request, listing_id):
+    if request.method == "POST":
+        listing = Listing.objects.get(pk=listing_id)
+        print(listing.seller, request.user)
+        if listing.seller == request.user:
+            listing.is_active = False
+            listing.save()
+
+    return HttpResponseRedirect(reverse("listing", args=(listing_id,)))
 
 
 @login_required
@@ -63,6 +76,8 @@ def listing_new(request):
 def bid_new(request, listing_id):
     if request.method == "POST":
         listing = Listing.objects.get(pk=listing_id)
+        if not listing.is_active:
+            return HttpResponseRedirect(reverse("listing", args=(listing_id, )))
 
         bidder = request.user
         amount = request.POST.get("bid_amount")
