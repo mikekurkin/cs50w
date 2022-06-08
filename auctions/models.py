@@ -31,6 +31,11 @@ class Listing(models.Model):
             return None
         return max(bids)
 
+    def winner(self):
+        if self.is_active or self.winning_bid() is None:
+            return None
+        return self.winning_bid().bidder
+
     def __str__(self):
         s = f"{self.id}: {self.title} by {self.seller}"
         bids_count = len(self.bids.all())

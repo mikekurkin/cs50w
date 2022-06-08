@@ -9,9 +9,9 @@
         {{ listing.title }}
     </h2>
     
-        <h3>
+        
             {% if listing.is_active %}
-                Active
+                <h3>Active</h3>
                 {% if user == listing.seller %}
                     <form action="{% url 'listing_close' listing.pk %}" method="post">
                         {% csrf_token %}
@@ -19,9 +19,13 @@
                     </form>
                 {% endif %}
             {% else %}
-                Closed
+                <h3>Closed</h3>
+                {% if user == listing.seller %}
+                    <p>Won by {{ listing.winner }}</p>
+                {% elif user == listing.winner %}
+                    <p>You won!</p>
+                {% endif %}
             {% endif %}
-        </h3>
 
     <h3>
         Highest Bid: 
