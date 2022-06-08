@@ -4,7 +4,7 @@ from functools import total_ordering
 
 
 class User(AbstractUser):
-    pass
+    watchlist = models.ManyToManyField('Listing', blank=True, related_name="watchers")
 
 
 class Category(models.Model):
