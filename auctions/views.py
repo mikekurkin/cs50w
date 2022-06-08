@@ -1,3 +1,4 @@
+import re
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
@@ -15,10 +16,11 @@ def index(request):
     })
 
 
-def listing_show(request, listing_id):
+def listing_show(request, listing_id, message=None):
     listing = Listing.objects.get(pk=listing_id)
     return render(request, "auctions/listing.html", {
-        "listing": listing
+        "listing": listing,
+        "message": message
     })
 
 
@@ -56,6 +58,29 @@ def listing_new(request):
         "listing": listing,
         "categories": categories
     })
+
+
+@login_required
+def bid_new(request, listing_id):
+    if request.method == "POST":
+        listing = Listing.objects.get(pk=listing_id)
+
+        bidder = request.user
+        amount = request.POST.get("bid_amount")
+        try:
+            amount = round(float(amount), 2)
+        except ValueError:
+            amount = None
+        if amount is None or amount <= 0:
+            return HttpResponseRedirect(reverse("listing", args=(listing_id, )))
+        if listing.winning_bid() is not None and amount < listing.winning_bid().amount + 0.01:
+            return HttpResponseRedirect(reverse("listing", args=(listing_id, )))
+
+        new_bid = Bid(bid_listing=listing, bidder=bidder, amount=amount)
+        new_bid.save()
+        print(new_bid)
+
+    return HttpResponseRedirect(reverse("listing", args=(listing_id,)))
 
 
 def login_view(request):

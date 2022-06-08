@@ -1,29 +1,52 @@
 {% extends "auctions/layout.html" %}
 
 {% block body %}
+    {% if message %}
+        <div>{{ message }}</div>
+    {% endif %}
+
     <h2>
         {{ listing.title }}
     </h2>
-
-    <h3>
-        $ {{ listing.st_bid.amount | floatformat:2 }}
-    </h3>
-
     
-    {% if listing.image_url %}
-    <div class="listing_image">
-        <img src="{{ listing.image_url }}" />
-    </div>
-    {% endif %}
+        <h3>
+            {% if listing.is_active %}
+                Active
+            {% else %}
+                Closed
+            {% endif %}
+        </h3>
 
     <h3>
-        {% if listing.is_active %}
-            Active
+        Highest Bid: 
+        {% if listing.winning_bid is not None %}
+            $ {{ listing.winning_bid.amount | floatformat:2 }}
         {% else %}
-            Closed
+            None
         {% endif %}
     </h3>
-
-    <div class="listing_descr">{{ listing.description }}</div>
     
+    {% if user.is_authenticated %}
+    <form class="row" action="{% url 'bid_new' listing.pk %}" method="post">
+        {% csrf_token %}
+        <div class="col-auto">
+            <input autofocus class="form-control" required type="number" step="0.01" name="bid_amount" placeholder="Amount">
+        </div>
+        <div class="col-auto">
+            <input class="btn btn-primary" type="submit" value="Bid">
+        </div>
+        </form>
+        {% else %}
+        <p>Log in to bid</p>
+        {% endif %}
+        <hr>
+        
+        {% if listing.image_url %}
+        <div class="listing_image">
+            <img src="{{ listing.image_url }}" />
+        </div>
+        {% endif %}
+
+        <div class="listing_descr">{{ listing.description }}</div>
+        
 {% endblock %}

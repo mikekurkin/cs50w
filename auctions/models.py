@@ -55,7 +55,7 @@ class Bid(models.Model):
     amount = models.FloatField()
 
     def __str__(self):
-        s = f"{self.time}: {self.amount} by {self.bidder}"
+        s = f"For #{self.bid_listing.pk}: {self.amount} by {self.bidder} ({self.time})"
         return s
 
     def __eq__(self, other):
