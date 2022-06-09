@@ -60,11 +60,13 @@
         <hr>
     {% endif %}
     
-    {% if listing.image_url %}
-    <div class="listing_image">
-        <img src="{{ listing.image_url }}" />
-    </div>
-    {% endif %}
+        <h3>
+            {% if listing.is_active %}
+                Active
+            {% else %}
+                Closed
+            {% endif %}
+        </h3>
 
     <div class="listing_descr">{{ listing.description }}</div>
 
@@ -93,4 +95,27 @@
     {% endfor %}
     </ul>
     
+    {% if user.is_authenticated %}
+    <form class="row" action="{% url 'bid_new' listing.pk %}" method="post">
+        {% csrf_token %}
+        <div class="col-auto">
+            <input autofocus class="form-control" required type="number" step="0.01" name="bid_amount" placeholder="Amount">
+        </div>
+        <div class="col-auto">
+            <input class="btn btn-primary" type="submit" value="Bid">
+        </div>
+        </form>
+        {% else %}
+        <p>Log in to bid</p>
+        {% endif %}
+        <hr>
+        
+        {% if listing.image_url %}
+        <div class="listing_image">
+            <img src="{{ listing.image_url }}" />
+        </div>
+        {% endif %}
+
+        <div class="listing_descr">{{ listing.description }}</div>
+        
 {% endblock %}
