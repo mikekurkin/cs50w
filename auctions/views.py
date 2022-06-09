@@ -15,6 +15,22 @@ def index(request):
     })
 
 
+def categories(request):
+    categories = Category.objects.all()
+    return render(request, "auctions/categories.html", {
+        "categories": categories
+    })
+
+
+def category(request, category_id):
+    category = Category.objects.get(pk=category_id)
+    category_listings = category.listings.all()
+    return render(request, "auctions/category.html", {
+        "category_name": category.name,
+        "listings": category_listings
+    })
+
+
 @login_required
 def watch_listing(request, listing_id, set=True):
     listing = Listing.objects.get(pk=listing_id)
