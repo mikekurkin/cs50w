@@ -5,7 +5,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 
-from .models import User, Listing, Category, Bid
+from .models import User, Listing, Category, Bid, Comment
 
 
 def index(request):
@@ -117,7 +117,23 @@ def bid_new(request, listing_id):
 
         new_bid = Bid(bid_listing=listing, bidder=bidder, amount=amount)
         new_bid.save()
-        print(new_bid)
+
+    return HttpResponseRedirect(reverse("listing", args=(listing_id,)))
+
+
+@login_required
+def comment_new(request, listing_id):
+    if request.method == "POST":
+        listing = Listing.objects.get(pk=listing_id)
+
+        author = request.user
+        text = request.POST.get("comment_text")
+
+        if text is None or text == "":
+            return HttpResponseRedirect(reverse("listing", args=(listing_id, )))
+
+        new_comment = Comment(comment_listing=listing, author=author, text=text)
+        new_comment.save()
 
     return HttpResponseRedirect(reverse("listing", args=(listing_id,)))
 

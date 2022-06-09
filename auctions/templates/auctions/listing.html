@@ -44,17 +44,18 @@
     
     {% if listing.is_active %}
         {% if user.is_authenticated %}
-        <form class="row" action="{% url 'bid_new' listing.pk %}" method="post">
-            {% csrf_token %}
-            <div class="col-auto">
-                <input autofocus class="form-control" required type="number" step="0.01" name="bid_amount" placeholder="Amount">
-            </div>
-            <div class="col-auto">
-                <input class="btn btn-primary" type="submit" value="Bid">
-            </div>
-        </form>
+            <form class="row" action="{% url 'bid_new' listing.pk %}" method="post">
+                {% csrf_token %}
+                <div class="form-row">
+                    <div class="form-group mb-2 mx-sm-3 col">
+                        <input autofocus class="form-control" required type="number" step="0.01" name="bid_amount" placeholder="Amount">
+                    </div>
+                    
+                    <button class="btn btn-primary mb-2 col" type="submit">Bid</button>
+                </div>
+            </form>
         {% else %}
-        <p>Log in to bid</p>
+            <i>Log in to make a bid</i>
         {% endif %}
         <hr>
     {% endif %}
@@ -66,5 +67,30 @@
     {% endif %}
 
     <div class="listing_descr">{{ listing.description }}</div>
-        
+
+    <hr>
+
+    {% if user.is_authenticated %}
+        <form class="row" action="{% url 'comment_new' listing.pk %}" method="post">
+            {% csrf_token %}
+            <div class="form-row">
+            <div class="form-group mb-2 mx-sm-3">
+                <textarea class="form-control" required type="text" name="comment_text" placeholder="Write a comment"></textarea>
+            </div>
+            <button class="btn btn-secondary mb-2" type="submit">Post</button>
+            </div>
+        </form>
+    {% else %}
+        <i>Log in to post a comment</i>
+    {% endif %}
+    
+    <ul>
+    {% for comment in listing.comments.all|dictsortreversed:"time" %}
+    <li>
+        <i>{{ comment.time|date:"SHORT_DATETIME_FORMAT" }}</i> <b>{{ comment.author.username }}:</b>
+        <p>{{ comment.text }}</p>
+    </li>
+    {% endfor %}
+    </ul>
+    
 {% endblock %}
