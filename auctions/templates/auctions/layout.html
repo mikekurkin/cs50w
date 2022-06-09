@@ -24,6 +24,11 @@
             </li>
             {% if user.is_authenticated %}
                 <li class="nav-item">
+                    <a href="{% url 'watchlist' %}" class="nav-link {% block watchlist-active %}{% endblock %}">
+                        My Watchlist
+                    </a>
+                </li>
+                <li class="nav-item">
                     <a href="{% url 'listing_new' %}" class="nav-link {% block listing-new-active %}{% endblock %}">
                         Create Listing
                     </a>

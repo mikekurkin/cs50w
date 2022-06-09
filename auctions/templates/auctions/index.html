@@ -1,15 +1,7 @@
-{% extends "auctions/layout.html" %}
+{% extends "auctions/listing_list.html" %}
 
 {% block index-active %}nav-active{% endblock %}
 
-{% block body %}
-  <h2>Active Listings</h2>
+{% block title %}Active Listings{% endblock %}
 
-  <ul>
-  {% for listing in listings %}
-    <li><a href="{% url 'listing' listing.id %}">{{ listing }}</a></li>
-  {% empty %}
-    No active listings
-  {% endfor %}
-  </ul>
-{% endblock %}
+{% block empty %}No active listings{% endblock %}

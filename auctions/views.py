@@ -1,4 +1,3 @@
-import re
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
@@ -13,6 +12,32 @@ def index(request):
     active_listings = Listing.objects.filter(is_active=True)
     return render(request, "auctions/index.html", {
         "listings": active_listings
+    })
+
+
+@login_required
+def watch_listing(request, listing_id, set=True):
+    listing = Listing.objects.get(pk=listing_id)
+    user = request.user
+    if set:
+        user.watchlist.add(listing)
+    else:
+        if listing in user.watchlist.all():
+            user.watchlist.remove(listing)
+    user.save()
+    return HttpResponseRedirect(reverse("listing", args=(listing_id,)))
+
+
+@login_required
+def unwatch_listing(request, listing_id):
+    return watch_listing(request=request, listing_id=listing_id, set=False)
+
+
+@login_required
+def watchlist(request):
+    list = request.user.watchlist.all()
+    return render(request, "auctions/watchlist.html", {
+        "listings": list
     })
 
 
