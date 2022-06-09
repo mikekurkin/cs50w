@@ -19,7 +19,6 @@ class Listing(models.Model):
     description = models.TextField(max_length=1000)
     seller = models.ForeignKey(User, on_delete=models.CASCADE, related_name="listings")
     is_active = models.BooleanField(default=True)
-    # st_bid = models.FloatField(verbose_name="Starting bid")
     st_bid = models.ForeignKey('Bid', null=True, default=None, on_delete=models.CASCADE, verbose_name="Starting bid")
     time = models.DateTimeField(auto_now_add="True")
     image_url = models.URLField(max_length=200, null=True, blank=True)
@@ -72,3 +71,17 @@ class Bid(models.Model):
         if type(other) != type(self):
             return False
         return self.bid_listing == other.bid_listing and self.amount > other.amount
+
+
+class Comment(models.Model):
+    comment_listing = models.ForeignKey(Listing, on_delete=models.CASCADE, related_name="comments")
+    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name="comments")
+    time = models.DateTimeField(auto_now_add="True")
+    text = models.TextField(max_length=200)
+
+    def short_text(self):
+        return (self.text[:22] + "...") if len(self.text) > 25 else self.text
+
+    def __str__(self):
+        s = f"For #{self.comment_listing.pk}: \"{self.short_text()}\" by {self.author} ({self.time})"
+        return s
