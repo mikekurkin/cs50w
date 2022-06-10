@@ -9,6 +9,7 @@ a.nav-active {
     cursor: default;
 }
 
-.listing_descr {
-    white-space: pre;
+.listing-image {
+    max-height: 30rem;
+    object-fit: contain;
 }

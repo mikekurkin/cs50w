@@ -4,75 +4,112 @@
     {% if message %}
         <div>{{ message }}</div>
     {% endif %}
-
-    <h2>
+    <div class="row">
+    <div id="leftpane" class="col-md mb-3">
+    <h2 class="mt-2">
         {{ listing.title }}
+        {% if user.is_authenticated %}
+        {% if listing not in user.watchlist.all %}
+            <sup><a href="{% url 'watch_listing' listing.pk %}" class="badge badge-pill badge-secondary">
+                ☆
+            </a></sup>
+        {% else %}
+            <sup><a href="{% url 'unwatch_listing' listing.pk %}" class="badge badge-pill badge-info">
+                ★
+            </a></sup>
+        {% endif %}
+        {% endif %}
     </h2>
     
-    {% if listing not in user.watchlist.all %}
-        <a href="{% url 'watch_listing' listing.pk %}">Add to Watchlist</a>
-    {% else %}
-        In your Watchlist (<a href="{% url 'unwatch_listing' listing.pk %}">Remove</a>)
-    {% endif %}
-
+    <div class="card rounded bg-secondary">
+        <img class="card-img-top listing-image"
+             src="{% if listing.image_url is not None %}{{ listing.image_url }}{% endif %}" 
+             alt="{% if listing.image_url is None %}No picture :({% endif %}"
+        >
         
-    {% if listing.is_active %}
-        <h3>Active</h3>
-        {% if user == listing.seller %}
-            <form action="{% url 'listing_close' listing.pk %}" method="post">
-                {% csrf_token %}
-                <input class="btn btn-danger" type="submit" value="Close">
-            </form>
-        {% endif %}
-    {% else %}
-        <h3>Closed</h3>
-        {% if user == listing.seller %}
-            <p>Won by {{ listing.winner }}</p>
-        {% elif user == listing.winner %}
-            <p>You won!</p>
-        {% endif %}
-    {% endif %}
+    </div>    
 
-    <h3>
-        Highest Bid: 
-        {% if listing.winning_bid is not None %}
-            $ {{ listing.winning_bid.amount | floatformat:2 }}
-        {% else %}
-            None
-        {% endif %}
-    </h3>
+    </div>
+
+    <div id="rightpane" class="col-md-5 mb-3">
+    <div class="row align-items-end mt-2">
+            <div class="col-4">
+                <h2>
+                {% if listing.winning_bid is not None %}   
+                $&#x202F;{{ listing.winning_bid.amount | floatformat:0 }}    
+                {% else %}
+                No bids
+                {% endif %}
+                </h2>
+            </div>
+            <div class="col text-right">
+                {% if listing.winning_bid != listing.st_bid %} 
+                <h6 class="text-muted">{{ listing.bids.count | add:-1 }}&nbsp;bid{% if listing.bids.count > 2 %}s, latest{% endif %}
+                by&nbsp;{{ listing.winning_bid.bidder }}
+                </h6>
+                {% endif %}
+            </div>
+        
+    </div>
     
     {% if listing.is_active %}
         {% if user.is_authenticated %}
-            <form class="row" action="{% url 'bid_new' listing.pk %}" method="post">
+            <form action="{% url 'bid_new' listing.pk %}" method="post">
                 {% csrf_token %}
-                <div class="form-row">
-                    <div class="form-group mb-2 mx-sm-3 col">
-                        <input autofocus class="form-control" required type="number" step="0.01" name="bid_amount" placeholder="Amount">
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">$</span>
                     </div>
-                    
-                    <button class="btn btn-primary mb-2 col" type="submit">Bid</button>
+                    <input autofocus class="form-control form-control-lg" required 
+                           type="number" step="0.01" name="bid_amount" 
+                           value={{ listing.winning_bid.amount | add:1 | floatformat:0 }}
+                    >
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-primary btn-lg" type="submit"><b>Bid</b></button>
+                    </div>
                 </div>
             </form>
         {% else %}
             <i>Log in to make a bid</i>
         {% endif %}
-        <hr>
-    {% endif %}
+        {% endif %}
+        <h4>Sold by <b>{{ listing.seller }}</b></h4>
+        
+        {% if listing.is_active %}
+            <div class="row mx-2 align-items-center">
+            <span class="badge badge-success">Active</span>
+            {% if user == listing.seller %}
+                <form action="{% url 'listing_close' listing.pk %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-link btn-sm">Close</button>
+                </form>
+            {% endif %}
+            </div>
+        {% else %}
+            <span class="badge badge-secondary">Closed</span>
+            {% if user == listing.winner %}
+                <p><b>You won!</b></p>
+            {% elif user == listing.seller %}
+                <p>Won by <b>{{ listing.winner }}</b></p>
+            {% endif %}
+        {% endif %}
+
     
-
-    <div class="listing_descr">{{ listing.description }}</div>
-
+    </div>
+    </div>  
+    <div id="listing-description">
+        <p>{{ listing.description }}</p>
+    </div>
     <hr>
 
     {% if user.is_authenticated %}
-        <form class="row" action="{% url 'comment_new' listing.pk %}" method="post">
+        <form action="{% url 'comment_new' listing.pk %}" method="post">
             {% csrf_token %}
-            <div class="form-row">
-            <div class="form-group mb-2 mx-sm-3">
-                <textarea class="form-control" required type="text" name="comment_text" placeholder="Write a comment"></textarea>
+            <div class="input-group mb-3">
+            <textarea class="form-control" required type="text" name="comment_text" placeholder="Write a comment"></textarea>
+            <div class="input-group-append">
+                <button class="btn btn-secondary" type="submit">Post</button>
             </div>
-            <button class="btn btn-secondary mb-2" type="submit">Post</button>
             </div>
         </form>
     {% else %}
