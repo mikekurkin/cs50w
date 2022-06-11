@@ -6,22 +6,22 @@
     {% endif %}
     <div class="row">
     <div id="leftpane" class="col-md mb-3">
-    <h2 class="mt-2">
+    <h2 class="mt-2 font-weight-bold">
         {{ listing.title }}
         {% if user.is_authenticated %}
-        {% if listing not in user.watchlist.all %}
-            <sup><a href="{% url 'watch_listing' listing.pk %}" class="badge badge-pill badge-secondary">
-                ☆
-            </a></sup>
-        {% else %}
-            <sup><a href="{% url 'unwatch_listing' listing.pk %}" class="badge badge-pill badge-info">
-                ★
-            </a></sup>
-        {% endif %}
+            {% if listing not in user.watchlist.all %}
+                <sup><a href="{% url 'watch_listing' listing.pk %}" class="badge badge-secondary">
+                    ☆
+                </a></sup>
+            {% else %}
+                <sup><a href="{% url 'unwatch_listing' listing.pk %}" class="badge badge-info">
+                    ★
+                </a></sup>
+            {% endif %}
         {% endif %}
     </h2>
     
-    <div class="card rounded bg-secondary">
+    <div class="card rounded bg-light">
         <img class="card-img-top listing-image"
              src="{% if listing.image_url is not None %}{{ listing.image_url }}{% endif %}" 
              alt="{% if listing.image_url is None %}No picture :({% endif %}"
@@ -33,10 +33,10 @@
 
     <div id="rightpane" class="col-md-5 mb-3">
     <div class="row align-items-end mt-2">
-            <div class="col-4">
+            <div class="col-xs-6">
                 <h2>
                 {% if listing.winning_bid is not None %}   
-                $&#x202F;{{ listing.winning_bid.amount | floatformat:0 }}    
+                $&#x202F;{{ listing.winning_bid.amount | floatformat:"-2" }}    
                 {% else %}
                 No bids
                 {% endif %}
@@ -62,7 +62,7 @@
                     </div>
                     <input autofocus class="form-control form-control-lg" required 
                            type="number" step="0.01" name="bid_amount" 
-                           value={{ listing.winning_bid.amount | add:1 | floatformat:0 }}
+                           value={{ listing.winning_bid.amount | add:1 | floatformat:"-2" }}
                     >
                     <div class="input-group-append">
                         <button class="btn btn-outline-primary btn-lg" type="submit"><b>Bid</b></button>
@@ -70,10 +70,15 @@
                 </div>
             </form>
         {% else %}
-            <i>Log in to make a bid</i>
+            <p class="font-italic">Log in to make a bid</p>
         {% endif %}
         {% endif %}
-        <h4>Sold by <b>{{ listing.seller }}</b></h4>
+        <h4 class="mb-3">Sold by <b>{{ listing.seller }}</b></h4>
+        {% if listing.category is not None %}
+        <p class="text-muted mb-2">Listed in <a href="{% url 'category' listing.category.pk %}" class="text-muted">{{ listing.category }}</a></p>
+        {% endif %}
+        <p class="text-muted font-italic">Created {{ listing.time|date:"j M y, G:i" }}</p>
+
         
         {% if listing.is_active %}
             <div class="row mx-2 align-items-center">
@@ -81,16 +86,14 @@
             {% if user == listing.seller %}
                 <form action="{% url 'listing_close' listing.pk %}" method="post">
                     {% csrf_token %}
-                    <button type="submit" class="btn btn-link btn-sm">Close</button>
+                    <button type="submit" class="btn btn-link btn-sm text-danger">× Close</button>
                 </form>
             {% endif %}
             </div>
         {% else %}
             <span class="badge badge-secondary">Closed</span>
             {% if user == listing.winner %}
-                <p><b>You won!</b></p>
-            {% elif user == listing.seller %}
-                <p>Won by <b>{{ listing.winner }}</b></p>
+                <div class="alert alert-success my-3 font-weight-bold" role="alert">You won!</div>
             {% endif %}
         {% endif %}
 
@@ -113,16 +116,22 @@
             </div>
         </form>
     {% else %}
-        <i>Log in to post a comment</i>
+        <p class="font-italic">Log in to post a comment</p>
     {% endif %}
     
-    <ul>
+    
     {% for comment in listing.comments.all|dictsortreversed:"time" %}
-    <li>
-        <i>{{ comment.time|date:"SHORT_DATETIME_FORMAT" }}</i> <b>{{ comment.author.username }}:</b>
-        <p>{{ comment.text }}</p>
-    </li>
+    <div class="card">
+        <div class="card-body">
+            <div class="row">
+                <div class="col"><p class="card-title font-weight-bold">{{ comment.author.username }}:</p></div>
+                <div class="col-md-4 col-5 text-right"><i class="text-muted">{{ comment.time|date:"j M y, G:i" }}</i></div>
+            </div>
+            <p class="card-text ml-3">{{ comment.text }}</p>
+          
+        </div>
+    </div>
     {% endfor %}
-    </ul>
+    
     
 {% endblock %}
