@@ -85,4 +85,3 @@ class Comment(models.Model):
     def __str__(self):
         s = f"For #{self.comment_listing.pk}: \"{self.short_text()}\" by {self.author} ({self.time})"
         return s
-        return s

@@ -1,0 +1,20 @@
+{% extends "auctions/layout.html" %}
+
+{% block title %}
+    Error {{ status }}
+{% endblock %}
+
+{% block nav %}
+    
+{% endblock %}
+
+{% block body %}
+
+    <h1>
+        Error {{ status | safe }}
+    </h1>
+    <h2> 
+        {{ text | safe }} 
+    </h2>    
+
+{% endblock %}

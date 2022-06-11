@@ -1,10 +1,10 @@
-import re
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
 from django.http import HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
+from django.utils.http import urlencode
 
 from .models import User, Listing, Category, Bid, Comment
 
@@ -16,6 +16,13 @@ def index(request):
     })
 
 
+def error_404(request, exception):
+    return render(request, "auctions/error.html", {
+        "status": 404,
+        "text": f"{request.path} not found"
+    }, status=404)
+
+
 def categories(request):
     categories = Category.objects.all()
     return render(request, "auctions/categories.html", {
@@ -24,7 +31,7 @@ def categories(request):
 
 
 def category(request, category_id):
-    category = Category.objects.get(pk=category_id)
+    category = get_object_or_404(Category, pk=category_id)
     category_listings = category.listings.all()
     return render(request, "auctions/category.html", {
         "category_name": category.name,
@@ -32,9 +39,15 @@ def category(request, category_id):
     })
 
 
+def redirect_with_msg(m, *args, **kwargs):
+    rev = reverse(*args, **kwargs)
+    ret = rev + "?" + urlencode({'m': m})
+    return HttpResponseRedirect(ret)
+
+
 @login_required
 def watch_listing(request, listing_id, set=True):
-    listing = Listing.objects.get(pk=listing_id)
+    listing = get_object_or_404(Listing, pk=listing_id)
     user = request.user
     if set:
         user.watchlist.add(listing)
@@ -59,7 +72,10 @@ def watchlist(request):
 
 
 def listing_show(request, listing_id, message=None):
-    listing = Listing.objects.get(pk=listing_id)
+    listing = get_object_or_404(Listing, pk=listing_id)
+    m = request.GET.get("m")
+    if m is not None:
+        message = m
     return render(request, "auctions/listing.html", {
         "listing": listing,
         "message": message
@@ -69,7 +85,7 @@ def listing_show(request, listing_id, message=None):
 @login_required
 def listing_close(request, listing_id):
     if request.method == "POST":
-        listing = Listing.objects.get(pk=listing_id)
+        listing = get_object_or_404(Listing, pk=listing_id)
         print(listing.seller, request.user)
         if listing.seller == request.user:
             listing.is_active = False
@@ -117,7 +133,7 @@ def listing_new(request):
 @login_required
 def bid_new(request, listing_id):
     if request.method == "POST":
-        listing = Listing.objects.get(pk=listing_id)
+        listing = get_object_or_404(Listing, pk=listing_id)
         if not listing.is_active:
             return HttpResponseRedirect(reverse("listing", args=(listing_id, )))
 
@@ -128,9 +144,9 @@ def bid_new(request, listing_id):
         except ValueError:
             amount = None
         if amount is None or amount <= 0:
-            return HttpResponseRedirect(reverse("listing", args=(listing_id, )))
+            return redirect_with_msg("Please fill in your bid", "listing", args=(listing_id, ))
         if listing.winning_bid() is not None and amount < listing.winning_bid().amount + 0.01:
-            return HttpResponseRedirect(reverse("listing", args=(listing_id, )))
+            return redirect_with_msg("Bid should be higher than current maximum bid", "listing", args=(listing_id, ))
 
         new_bid = Bid(bid_listing=listing, bidder=bidder, amount=amount)
         new_bid.save()
@@ -141,13 +157,13 @@ def bid_new(request, listing_id):
 @login_required
 def comment_new(request, listing_id):
     if request.method == "POST":
-        listing = Listing.objects.get(pk=listing_id)
+        listing = get_object_or_404(Listing, pk=listing_id)
 
         author = request.user
         text = request.POST.get("comment_text")
 
         if text is None or text == "":
-            return HttpResponseRedirect(reverse("listing", args=(listing_id, )))
+            return redirect_with_msg("Please fill in your comment", "listing", args=(listing_id, ))
 
         new_comment = Comment(comment_listing=listing, author=author, text=text)
         new_comment.save()
