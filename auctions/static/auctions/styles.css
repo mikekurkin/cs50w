@@ -13,3 +13,17 @@ a.nav-active {
     max-height: 30rem;
     object-fit: contain;
 }
+
+.list-image {
+    height: 18rem;
+    object-fit: cover;
+}
+
+a > .card {
+    transition: all .1s;
+    /* height: 15rem; */
+}
+
+a > .card:hover {
+    filter: brightness(90%);
+}

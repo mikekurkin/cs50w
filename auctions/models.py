@@ -35,6 +35,9 @@ class Listing(models.Model):
             return None
         return self.winning_bid().bidder
 
+    def short_description(self):
+        return (self.description[:197] + "...") if len(self.description) > 200 else self.description
+
     def __str__(self):
         s = f"{self.id}: {self.title} by {self.seller}"
         bids_count = len(self.bids.all())
