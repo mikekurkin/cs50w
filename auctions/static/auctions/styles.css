@@ -19,11 +19,25 @@ a.nav-active {
     object-fit: cover;
 }
 
+.closed-listing {
+    filter: saturate(30%) opacity(70%);
+}
+
 a > .card {
     transition: all .1s;
-    /* height: 15rem; */
 }
 
 a > .card:hover {
     filter: brightness(90%);
+}
+
+#listing-card-title {
+    width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#listing-title, #listing-seller, #listing-category {
+    overflow-wrap: break-word;
 }

@@ -3,10 +3,9 @@
 {% block body %}
   <h2 class="mb-4">{% block title %}{% endblock %}</h2>
 
-  {% comment %} <div class="card-deck"> {% endcomment %}
-  {% for listing in listings %}
+  {% for listing in listings.all|dictsortreversed:"time" %}
   <a href="{% url 'listing' listing.pk %}" class="text-secondary text-decoration-none">
-    <div class="card my-3">
+    <div class="card my-3{% if not listing.is_active %} closed-listing{% endif %}">
         <div class="row no-gutter">
           {% if listing.image_url is not None %}
           <div class="col-md-4 col-sm-5 pr-sm-0">
@@ -15,10 +14,14 @@
           {% endif %}
           <div class="col{% if listing.image_url is not None %} pl-sm-0{% endif %}">
             <div class="card-header row mx-0">
-              <div class="col px-0">
-              <h5 class="my-1 font-weight-bold">{{ listing.title }}</h5>
+              <div class="col-11-sm col-8 px-0">
+              <h5 id="listing-card-title" class="my-1 font-weight-bold">{{ listing.title }}
+              {% if not listing.is_active %}
+              <sup><span class="badge badge-secondary">Closed</span></sup>
+              {% endif %}
+              </h5>
               </div>
-              <div class="col-4-sm col-7 px-0">
+              <div class="col px-0">
               <h5 class="my-1 text-right">
                 {% if listing.winning_bid is not None %}   
                 $&#x202F;{{ listing.winning_bid.amount | floatformat:"0" }}    

@@ -103,9 +103,15 @@ def listing_new(request):
         image_url = request.POST.get("image_url")
         if image_url == "":
             image_url = None
-        category = request.POST.get("category")
-        if category is not None:
-            category = int(category)
+        category_id = request.POST.get("category")
+        category = None
+        if category_id is not None:
+            category_id = int(category_id)
+            try:
+                category = Category.objects.get(pk=category_id)
+            except ValueError:
+                pass
+        
         seller = request.user
 
         listing = Listing(title=title, description=description, image_url=image_url,

@@ -5,8 +5,8 @@
         <div class="alert alert-warning" role="alert">{{ message }}</div>
     {% endif %}
     <div class="row">
-    <div id="leftpane" class="col-md mb-3">
-    <h2 class="mt-2 font-weight-bold">
+    <div id="leftpane" class="col-md-7 mb-3">
+    <h2 id="listing-title" class="mt-2 font-weight-bold">
         {{ listing.title }}
         {% if user.is_authenticated %}
             {% if listing not in user.watchlist.all %}
@@ -31,10 +31,10 @@
 
     </div>
 
-    <div id="rightpane" class="col-md-5 mb-3">
+    <div id="rightpane" class="col-md mb-3">
     <div class="row align-items-end mt-2">
             <div class="col-xs-6">
-                <h2>
+                <h2 class="mx-3">
                 {% if listing.winning_bid is not None %}   
                 $&#x202F;{{ listing.winning_bid.amount | floatformat:"-2" }}    
                 {% else %}
@@ -73,9 +73,9 @@
             <p class="font-italic">Log in to make a bid</p>
         {% endif %}
         {% endif %}
-        <h4 class="mb-3">Sold by <b>{{ listing.seller }}</b></h4>
+        <h4 id="listing-seller" class="mb-3">Sold by <b>{{ listing.seller }}</b></h4>
         {% if listing.category is not None %}
-        <p class="text-muted mb-2">Listed in <a href="{% url 'category' listing.category.pk %}" class="text-muted">{{ listing.category }}</a></p>
+        <p class="listing-category" class="text-muted mb-2">Listed in <a href="{% url 'category' listing.category.pk %}" class="text-muted">{{ listing.category }}</a></p>
         {% endif %}
         <p class="text-muted font-italic">Created {{ listing.time|date:"j M y, G:i" }}</p>
 

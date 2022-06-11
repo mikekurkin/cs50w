@@ -35,6 +35,9 @@ class Listing(models.Model):
             return None
         return self.winning_bid().bidder
 
+    def short_title(self):
+        return (self.title[:29] + "...") if len(self.title) > 32 else self.title
+
     def short_description(self):
         return (self.description[:197] + "...") if len(self.description) > 200 else self.description
 
