@@ -1,15 +1,24 @@
 {% extends "auctions/layout.html" %}
 
-{% block categories-active %}nav-active{% endblock %}
+{% block categories-active %}nav-active active{% endblock %}
 
 {% block body %}
   <h2 class="mb-4">Categories</h2>
 
-  <ul>
+  
   {% for category in categories %}
-    <li><a href="{% url 'category' category.pk %}">{{ category.name }}</a></li>
+    
+    <a class="text-secondary" href="{% url 'category' category.pk %}">
+        <div class="card my-2">
+            <div class="card-body py-3">
+                <p class="card-text">
+                {{ category.name }}
+                </p>
+        </div>
+        </div>
+    </a>
   {% empty %}
     No categories
   {% endfor %}
-  </ul>
+  
 {% endblock %}

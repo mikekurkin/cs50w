@@ -1,10 +1,10 @@
 {% extends "auctions/layout.html" %}
 
-{% block register-active %}nav-active{% endblock %}
+{% block register-active %}nav-active active{% endblock %}
 
 {% block body %}
 
-    <h2>Register</h2>
+    <h2 class="mb-4">Register</h2>
 
     {% if message %}
         <div>{{ message }}</div>
@@ -27,6 +27,8 @@
         <input class="btn btn-primary" type="submit" value="Register">
     </form>
 
-    Already have an account? <a href="{% url 'login' %}">Log In here.</a>
+    <div class="alert alert-light" role="alert">
+        Already have an account? <a href="{% url 'login' %}">Log In here.</a>
+    </div>
 
 {% endblock %}
