@@ -60,15 +60,17 @@
                     <div class="input-group-prepend">
                         <span class="input-group-text">$</span>
                     </div>
-                    <input autofocus class="form-control form-control-lg" required 
-                           type="number" step="0.01" name="bid_amount" 
-                           value={{ listing.winning_bid.amount | add:1 | floatformat:"-2" }}
-                    >
+                    {{ bid_form.amount }}
                     <div class="input-group-append">
                         <button class="btn btn-outline-primary btn-lg" type="submit"><b>Bid</b></button>
                     </div>
                 </div>
             </form>
+            {% if bid_form.amount.errors %}
+                <div class="alert alert-danger" role="alert">
+                    {% for e in bid_form.amount.errors %}{{ e }}{% endfor %}
+                </div>
+            {% endif %}
         {% else %}
             <p class="font-italic">Log in to make a bid</p>
         {% endif %}

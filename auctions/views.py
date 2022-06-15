@@ -7,7 +7,7 @@ from django.urls import reverse
 from django.utils.http import urlencode
 
 from .models import User, Listing, Category, Bid, Comment
-from .forms import ListingForm
+from .forms import BidForm, ListingForm
 
 
 def index(request):
@@ -79,7 +79,8 @@ def listing_show(request, listing_id, message=None):
         message = m
     return render(request, "auctions/listing.html", {
         "listing": listing,
-        "message": message
+        "message": message,
+        "bid_form": BidForm(bid_listing=listing),
     })
 
 
@@ -138,15 +139,14 @@ def bid_new(request, listing_id):
             return HttpResponseRedirect(reverse("listing", args=(listing_id, )))
 
         bidder = request.user
-        amount = request.POST.get("bid_amount")
-        try:
-            amount = round(float(amount), 2)
-        except ValueError:
-            amount = None
-        if amount is None or amount <= 0:
-            return redirect_with_msg("Please fill in your bid", "listing", args=(listing_id, ))
-        if listing.winning_bid() is not None and amount < listing.winning_bid().amount + 0.01:
-            return redirect_with_msg("Bid should be higher than current maximum bid", "listing", args=(listing_id, ))
+
+        form = BidForm(listing, request.POST)
+        if not form.is_valid():
+            return render(request, "auctions/listing.html", {
+                "listing": listing,
+                "bid_form": form,
+            })
+        amount = form.cleaned_data.get('amount')
 
         new_bid = Bid(bid_listing=listing, bidder=bidder, amount=amount)
         new_bid.save()
