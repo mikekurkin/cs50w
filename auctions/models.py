@@ -19,10 +19,26 @@ class Listing(models.Model):
     description = models.TextField(max_length=1000)
     seller = models.ForeignKey(User, on_delete=models.CASCADE, related_name="listings")
     is_active = models.BooleanField(default=True)
-    st_bid = models.ForeignKey('Bid', null=True, default=None, on_delete=models.CASCADE, verbose_name="Starting bid")
+    st_bid_amount = models.FloatField(verbose_name="Starting bid (USD)")
+    st_bid = models.ForeignKey('Bid', null=True, default=None, editable=False, on_delete=models.CASCADE,
+                               verbose_name="Starting Bid")
     time = models.DateTimeField(auto_now_add="True")
-    image_url = models.URLField(max_length=200, null=True, blank=True)
+    image_url = models.URLField(max_length=200, null=True, blank=True, verbose_name="Image URL")
     category = models.ForeignKey(Category, null=True, blank=True, on_delete=models.SET_NULL, related_name="listings")
+
+    # Redefined Save method creates or updates
+    # a starting bid object based on amount
+    def save(self,  *args, **kwargs):
+        if self.st_bid is None:
+            super().save(*args, **kwargs)
+            bid = Bid(bid_listing=self, bidder=self.seller, amount=self.st_bid_amount)
+            bid.save()
+            self.st_bid = bid
+        else:
+            if self.st_bid.amount != self.st_bid_amount:
+                self.st_bid.amount = self.st_bid_amount
+                self.st_bid.save()
+        super().save(*args, **kwargs)
 
     def winning_bid(self):
         bids = self.bids.all()

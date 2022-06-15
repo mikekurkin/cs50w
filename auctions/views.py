@@ -7,6 +7,7 @@ from django.urls import reverse
 from django.utils.http import urlencode
 
 from .models import User, Listing, Category, Bid, Comment
+from .forms import ListingForm
 
 
 def index(request):
@@ -97,42 +98,35 @@ def listing_close(request, listing_id):
 @login_required
 def listing_new(request):
     if request.method == "POST":
-        title = request.POST.get("title")
-        description = request.POST.get("description")
-        st_bid_amount = float(request.POST.get("st_bid"))
-        image_url = request.POST.get("image_url")
-        if image_url == "":
-            image_url = None
-        category_id = request.POST.get("category")
-        category = None
-        if category_id is not None:
-            category_id = int(category_id)
-            try:
-                category = Category.objects.get(pk=category_id)
-            except ValueError:
-                pass
-        
-        seller = request.user
+        form = ListingForm(request.POST)
+        if not form.is_valid():
+            return render(request, "auctions/listing_new.html", {
+                "form": form,
+            })
+        f = form.cleaned_data
 
-        listing = Listing(title=title, description=description, image_url=image_url,
-                          category=category, seller=seller, is_active=True)
-        print(listing.pk)
-        listing.save()
-        print(listing.pk)
+        title = f.get('title')
+        description = f.get('description')
+        st_bid_amount = f.get('st_bid_amount')
+        image_url = f.get('image_url')
+        category = f.get('category')
 
-        st_bid = Bid(bid_listing=listing, bidder=seller, amount=st_bid_amount)
-        st_bid.save()
-
-        listing.st_bid = st_bid
+        listing = Listing(
+            title=title,
+            description=description,
+            st_bid_amount=st_bid_amount,
+            image_url=image_url,
+            category=category,
+            seller=request.user,
+            is_active=True
+            )
         listing.save()
 
         return HttpResponseRedirect(reverse("listing", args=(listing.pk,)))
 
-    listing = Listing()
-    categories = Category.objects.all()
+    form = ListingForm()
     return render(request, "auctions/listing_new.html", {
-        "listing": listing,
-        "categories": categories
+        "form": form,
     })
 
 
