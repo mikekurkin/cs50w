@@ -80,6 +80,10 @@ class Bid(models.Model):
     time = models.DateTimeField(auto_now_add="True")
     amount = models.FloatField()
 
+    def save(self, *args, **kwargs):
+        self.amount = round(self.amount, 2)
+        super().save(*args, **kwargs)
+
     def __str__(self):
         s = f"For #{self.bid_listing.pk}: {self.amount} by {self.bidder} ({self.time})"
         return s

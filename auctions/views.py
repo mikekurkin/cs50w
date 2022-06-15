@@ -4,7 +4,6 @@ from django.db import IntegrityError
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
-from django.utils.http import urlencode
 
 from .models import User, Listing, Category, Bid, Comment
 from .forms import BidForm, CommentForm, ListingForm
@@ -38,12 +37,6 @@ def category(request, category_id):
         "category_name": category.name,
         "listings": category_listings
     })
-
-
-def redirect_with_msg(m, *args, **kwargs):
-    rev = reverse(*args, **kwargs)
-    ret = rev + "?" + urlencode({'m': m})
-    return HttpResponseRedirect(ret)
 
 
 @login_required
