@@ -151,7 +151,7 @@ def bid_new(request, listing_id):
         new_bid = Bid(bid_listing=listing, bidder=bidder, amount=amount)
         new_bid.save()
 
-    return HttpResponseRedirect(reverse("listing", args=(listing_id,)))
+    return HttpResponseRedirect(reverse("watch_listing", args=(listing_id,)))
 
 
 @login_required
