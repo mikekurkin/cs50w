@@ -10,9 +10,13 @@ from .forms import BidForm, CommentForm, ListingForm
 
 
 def index(request):
-    active_listings = Listing.objects.filter(is_active=True)
+    if all := request.path.endswith('/all'):
+        listings = Listing.objects.all()
+    else:
+        listings = Listing.objects.filter(is_active=True)
     return render(request, "auctions/index.html", {
-        "listings": active_listings
+        "listings": listings, 
+        "all": all,
     })
 
 
@@ -32,10 +36,14 @@ def categories(request):
 
 def category(request, category_id):
     category = get_object_or_404(Category, pk=category_id)
-    category_listings = category.listings.all()
+    if all := request.path.endswith('/all'):
+        listings = category.listings.all()
+    else:
+        listings = category.listings.filter(is_active=True)
     return render(request, "auctions/category.html", {
-        "category_name": category.name,
-        "listings": category_listings
+        "category": category,
+        "listings": listings,
+        "all": all,
     })
 
 

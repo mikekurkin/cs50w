@@ -2,6 +2,9 @@
 
 {% block index-active %}active{% endblock %}
 
-{% block title %}Active Listings{% endblock %}
+{% block title %}{% if all %}All Listings{% else %}Active Listings{% endif %}{% endblock %}
+
+{% block showactive %}{% url 'index' %}{% endblock %}
+{% block showall %}{% url 'all' %}{% endblock %}
 
 {% block empty %}No active listings{% endblock %}

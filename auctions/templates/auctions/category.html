@@ -1,5 +1,8 @@
 {% extends "auctions/listing_list.html" %}
 
-{% block title %}{{ category_name }}{% endblock %}
+{% block title %}{% if all %}All in {{ category.name }}{% else %}Active in {{ category.name }}{% endif %}{% endblock %}
+
+{% block showactive %}{% url 'category' category.pk %}{% endblock %}
+{% block showall %}{% url 'category_all' category.pk %}{% endblock %}
 
 {% block empty %}No active listings in {{ category_name }}{% endblock %}

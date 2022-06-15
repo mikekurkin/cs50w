@@ -1,7 +1,20 @@
 {% extends "auctions/layout.html" %}
 
 {% block body %}
-  <h2 class="mb-4">{% block title %}{% endblock %}</h2>
+  <div class="row justify-content-start align-items-center mb-4">
+  <div class="col-auto">
+  <h2>{% block title %}{% endblock %}</h2>
+  </div>
+  <div class="col-auto">
+  {% block alltoggle %}
+  {% if all %}
+    <a class="text-muted mt-1 mb-3" href="{% block showactive %}#{% endblock %}">Show only active</a>
+  {% else %}
+    <a class="text-muted mt-1 mb-3" href="{% block showall %}#{% endblock %}">Show all</a>
+  {% endif %}
+  {% endblock %}
+  </div>
+  </div>
 
   {% for listing in listings.all|dictsortreversed:"time" %}
   <a href="{% url 'listing' listing.pk %}" class="text-secondary text-decoration-none">
@@ -32,7 +45,7 @@
               </div>
             </div>
             <div class="card-body">
-              <p class="card-text">{{ listing.short_description }}</p>
+              <p class="card-text">{{ listing.short_description|linebreaks }}</p>
               <p class="card-text text-right font-italic"><small class="text-muted">Created by <b>{{ listing.seller }}</b> {{ listing.time|date:"j M y, G:i" }}</small></p>
             </div>
           </div>
