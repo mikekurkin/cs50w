@@ -17,10 +17,13 @@ class BidForm(forms.ModelForm):
         amount_w.attrs['class'] = 'form-control form-control-lg'
         if bid_listing is not None and bid_listing.winning_bid() is not None:
             amount_f.validators.append(
-                MinValueValidator(bid_listing.winning_bid().amount + 0.01, 
+                MinValueValidator(bid_listing.winning_bid().amount + 0.01,
                                   message="The bid must be higher than the current winning bid"))
             amount_w.attrs['min'] = bid_listing.winning_bid().amount + 0.01
             amount_w.attrs['value'] = int(bid_listing.winning_bid().amount) + 1
+        else:
+            amount_w.attrs['min'] = 0
+            amount_f.validators.append(MinValueValidator(0))
 
 
 class CommentForm(forms.ModelForm):
@@ -43,6 +46,8 @@ class ListingForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields.get('title').widget.attrs['autofocus'] = True
+        self.fields.get('st_bid_amount').widget.attrs['min'] = 0
+        self.fields.get('st_bid_amount').validators.append(MinValueValidator(0))
         for visible in self.visible_fields():
             visible.field.widget.attrs['class'] = 'form-control'
             field_label = visible.label
