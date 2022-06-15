@@ -65,11 +65,9 @@ def watchlist(request):
     })
 
 
-def listing_show(request, listing_id, message=None):
+def listing_show(request, listing_id):
     listing = get_object_or_404(Listing, pk=listing_id)
-    m = request.GET.get("m")
-    if m is not None:
-        message = m
+
     return render(request, "auctions/listing.html", {
         "listing": listing,
         "bid_form": BidForm(bid_listing=listing),
