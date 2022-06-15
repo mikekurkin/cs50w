@@ -1,7 +1,7 @@
 from django import forms
 from django.core.validators import MinValueValidator
 
-from .models import Bid, Listing
+from .models import Bid, Comment, Listing
 
 
 class BidForm(forms.ModelForm):
@@ -21,6 +21,18 @@ class BidForm(forms.ModelForm):
                                   message="The bid must be higher than the current winning bid"))
             amount_w.attrs['min'] = bid_listing.winning_bid().amount + 0.01
             amount_w.attrs['value'] = int(bid_listing.winning_bid().amount) + 1
+
+
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = ['text']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields.get('text').widget.attrs['placeholder'] = 'Write a comment'
+        self.fields.get('text').widget.attrs['class'] = 'form-control'
+        self.fields.get('text').widget.attrs['rows'] = '2'
 
 
 class ListingForm(forms.ModelForm):

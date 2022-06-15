@@ -111,12 +111,17 @@
         <form action="{% url 'comment_new' listing.pk %}" method="post">
             {% csrf_token %}
             <div class="input-group mb-3">
-            <textarea class="form-control" required type="text" name="comment_text" placeholder="Write a comment"></textarea>
+            {{ comment_form.text }}
             <div class="input-group-append">
                 <button class="btn btn-secondary" type="submit">Post</button>
             </div>
             </div>
         </form>
+        {% if comment_form.text.errors %}
+            <div class="alert alert-danger" role="alert">
+                {% for e in comment_form.text.errors %}{{ e }}{% endfor %}
+            </div>
+        {% endif %}
     {% else %}
         <p class="font-italic">Log in to post a comment</p>
     {% endif %}

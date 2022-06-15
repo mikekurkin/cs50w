@@ -7,7 +7,7 @@ from django.urls import reverse
 from django.utils.http import urlencode
 
 from .models import User, Listing, Category, Bid, Comment
-from .forms import BidForm, ListingForm
+from .forms import BidForm, CommentForm, ListingForm
 
 
 def index(request):
@@ -81,6 +81,7 @@ def listing_show(request, listing_id, message=None):
         "listing": listing,
         "message": message,
         "bid_form": BidForm(bid_listing=listing),
+        "comment_form": CommentForm(),
     })
 
 
@@ -145,6 +146,7 @@ def bid_new(request, listing_id):
             return render(request, "auctions/listing.html", {
                 "listing": listing,
                 "bid_form": form,
+                "comment_form": CommentForm(),
             })
         amount = form.cleaned_data.get('amount')
 
@@ -160,10 +162,14 @@ def comment_new(request, listing_id):
         listing = get_object_or_404(Listing, pk=listing_id)
 
         author = request.user
-        text = request.POST.get("comment_text")
-
-        if text is None or text == "":
-            return redirect_with_msg("Please fill in your comment", "listing", args=(listing_id, ))
+        form = CommentForm(request.POST)
+        if not form.is_valid():
+            return render(request, "auctions/listing.html", {
+                "listing": listing,
+                "bid_form": BidForm(bid_listing=listing),
+                "comment_form": form,
+            })
+        text = form.cleaned_data.get('text')
 
         new_comment = Comment(comment_listing=listing, author=author, text=text)
         new_comment.save()
