@@ -72,7 +72,6 @@ def listing_show(request, listing_id, message=None):
         message = m
     return render(request, "auctions/listing.html", {
         "listing": listing,
-        "message": message,
         "bid_form": BidForm(bid_listing=listing),
         "comment_form": CommentForm(),
     })
