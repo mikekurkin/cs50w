@@ -58,16 +58,8 @@ class Listing(models.Model):
         return (self.description[:197] + "...") if len(self.description) > 200 else self.description
 
     def __str__(self):
-        s = f"{self.id}: {self.title} by {self.seller}"
-        bids_count = len(self.bids.all())
-        if bids_count == 0:
-            s += ", no bids"
-        elif bids_count == 1:
-            s += f", starting bid {self.st_bid.amount}"
-        else:
-            if self.winning_bid() is not None:
-                s += f", {bids_count - 1} bid{'s' if bids_count > 2 else ''}, max {self.winning_bid().amount}"
-
+        s = f"{self.id}: {self.title}"
+    
         if not self.is_active:
             s += " (Closed)"
         return s
@@ -85,7 +77,7 @@ class Bid(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        s = f"For #{self.bid_listing.pk}: {self.amount} by {self.bidder} ({self.time})"
+        s = f"#{self.pk}: {self.amount} for #{self.bid_listing.pk} by {self.bidder}"
         return s
 
     def __eq__(self, other):
