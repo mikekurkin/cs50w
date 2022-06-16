@@ -2,6 +2,8 @@
 
 {% block listing-new-active %}active{% endblock %}
 
+{% block title %}New Listing{% endblock %}
+
 {% block body %}
     <h2 class="mb-4">New Listing</h2>
     {% for field in form %}{% if field.errors %}

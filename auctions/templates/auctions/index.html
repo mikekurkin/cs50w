@@ -2,7 +2,7 @@
 
 {% block index-active %}active{% endblock %}
 
-{% block title %}{% if all %}All Listings{% else %}Active Listings{% endif %}{% endblock %}
+{% block title %}{% if all %}Auctions: All{% else %}Auctions: Active{% endif %}{% endblock %}
 
 {% block showactive %}{% url 'index' %}{% endblock %}
 {% block showall %}{% url 'all' %}{% endblock %}
