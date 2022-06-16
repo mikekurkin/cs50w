@@ -20,7 +20,6 @@ class ListingAdmin(admin.ModelAdmin):
         return obj.bids.count()
 
 
-
 # Register your models here.
 admin.site.register(User)
 admin.site.register(Category)

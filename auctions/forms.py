@@ -9,6 +9,8 @@ class BidForm(forms.ModelForm):
         model = Bid
         fields = ['amount']
 
+    # Bid form initializer sets input attributes to customize form
+    # and adds minimum value validator based on the listing winning bid
     def __init__(self, bid_listing=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
         amount_f = self.fields.get('amount')
@@ -31,6 +33,7 @@ class CommentForm(forms.ModelForm):
         model = Comment
         fields = ['text']
 
+    # Comment form initializer sets input attributes to customize form
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields.get('text').widget.attrs['placeholder'] = 'Write a comment'
@@ -43,6 +46,8 @@ class ListingForm(forms.ModelForm):
         model = Listing
         fields = ['title', 'st_bid_amount', 'description', 'image_url', 'category']
 
+    # Listing form initializer sets input attributes to customize form
+    # and adds minimum value (of zero) validator for starting bid field
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields.get('title').widget.attrs['autofocus'] = True

@@ -10,12 +10,13 @@ from .forms import BidForm, CommentForm, ListingForm
 
 
 def index(request):
+    # Gets all or only active listing based on request path
     if all := request.path.endswith('/all'):
         listings = Listing.objects.all()
     else:
         listings = Listing.objects.filter(is_active=True)
     return render(request, "auctions/index.html", {
-        "listings": listings, 
+        "listings": listings,
         "all": all,
     })
 
@@ -36,6 +37,7 @@ def categories(request):
 
 def category(request, category_id):
     category = get_object_or_404(Category, pk=category_id)
+    # Gets all or only active listing of given category based on request path
     if all := request.path.endswith('/all'):
         listings = category.listings.all()
     else:
@@ -54,8 +56,7 @@ def watch_listing(request, listing_id, set=True):
     if set:
         user.watchlist.add(listing)
     else:
-        if listing in user.watchlist.all():
-            user.watchlist.remove(listing)
+        user.watchlist.remove(listing)
     user.save()
     return HttpResponseRedirect(reverse("listing", args=(listing_id,)))
 
@@ -87,7 +88,7 @@ def listing_show(request, listing_id):
 def listing_close(request, listing_id):
     if request.method == "POST":
         listing = get_object_or_404(Listing, pk=listing_id)
-        print(listing.seller, request.user)
+        # Check that the request is sent by the seller
         if listing.seller == request.user:
             listing.is_active = False
             listing.save()
@@ -100,6 +101,7 @@ def listing_new(request):
     if request.method == "POST":
         form = ListingForm(request.POST)
         if not form.is_valid():
+            # Re-render the form with validation errors
             return render(request, "auctions/listing_new.html", {
                 "form": form,
             })
@@ -134,6 +136,7 @@ def listing_new(request):
 def bid_new(request, listing_id):
     if request.method == "POST":
         listing = get_object_or_404(Listing, pk=listing_id)
+        # Check that listing is active before accepting
         if not listing.is_active:
             return HttpResponseRedirect(reverse("listing", args=(listing_id, )))
 
@@ -141,6 +144,7 @@ def bid_new(request, listing_id):
 
         form = BidForm(listing, request.POST)
         if not form.is_valid():
+            # Re-render the form with validation errors
             return render(request, "auctions/listing.html", {
                 "listing": listing,
                 "bid_form": form,
@@ -162,6 +166,7 @@ def comment_new(request, listing_id):
         author = request.user
         form = CommentForm(request.POST)
         if not form.is_valid():
+            # Re-render the form with validation errors
             return render(request, "auctions/listing.html", {
                 "listing": listing,
                 "bid_form": BidForm(bid_listing=listing),
