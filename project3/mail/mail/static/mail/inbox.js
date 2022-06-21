@@ -24,6 +24,55 @@ function compose_email() {
   document.querySelector('#compose-body').value = '';
 }
 
+// Returns email list card element
+function list_card_el(email) {
+  const e = document.createElement('button');
+  e.id = `email${email.id}`;
+  e.type = 'button';
+  e.classList.add('list-group-item');
+  e.classList.add('list-group-item-action');
+  e.innerHTML = `
+    <h5 class="mb-1">${email.sender}</h5>
+    <p class="mb-1">${email.subject}</p>
+    <small>${email.timestamp}</small>
+  `;
+  if (email.read === false) {e.classList.add('unread-item')}
+  e.addEventListener('click', () => load_email(email.id));
+  return e;
+}
+
+// Returns email body view element
+function email_view_el(email) {
+  emailView = document.createElement('div');
+  emailView.id = 'email_view';
+  emailView.classList.add('col-8');
+
+  emailView.innerHTML = `
+    <h5 id="from">${email.sender}</h5>
+    <h4 id="subject">${email.subject}</h4>
+    <p id="to" class="mb-1">To: ${email.recipients}</p>
+    <small id="time" class="text-muted font-italic">${email.timestamp}</small>
+    <hr />
+    <p id="body">${email.body}</p>
+  `
+
+  return emailView
+} 
+
+function mailbox_wrapper_el() {
+  const mailboxWrapper = document.createElement('div')
+  mailboxWrapper.id = 'mailbox-wrapper';
+  mailboxWrapper.classList.add('row');
+  const mailbox = document.createElement('div');
+  mailbox.id = 'mailbox';
+  mailbox.classList.add('col');
+  mailbox.classList.add('list-group');
+  
+  mailboxWrapper.appendChild(mailbox);
+
+  return mailboxWrapper;
+}
+
 function load_mailbox(mailbox) {
   
   // Show the mailbox and hide other views
@@ -43,66 +92,44 @@ function load_mailbox(mailbox) {
 
     // Show list of e-mails
     if (emails.length > 0) {
-      const emailsView = document.querySelector('#emails-view');
-      const mailboxWrapper = document.createElement('div')
-      mailboxWrapper.id = 'mailbox-wrapper';
-      mailboxWrapper.classList.add('row');
-      const mailbox = document.createElement('div');
-      mailbox.id = 'mailbox';
-      mailbox.classList.add('col');
-      emailsView.appendChild(mailboxWrapper);
-      mailboxWrapper.appendChild(mailbox);
+      
+      document.querySelector('#emails-view').appendChild(mailbox_wrapper_el());
     
       emails.forEach(email => {
-        const e = document.createElement('div');
-        e.innerHTML = `<a href='#'><b>${email.sender}: ${email.subject}</b></a>`;
-        e.addEventListener('click', () => load_email(email.id));
-        document.querySelector('#mailbox').appendChild(e);
+        document.querySelector('#mailbox').appendChild(list_card_el(email));
       });
     };
   })
   .catch(error => console.log(error));
-};
+}
 
 function load_email(id) {
   console.log(`loading ${id}`);
-  fetch(`/emails/${id}`)
-  .then(response => response.json())
-  .then(email => {
-    let emailView = document.querySelector('#email_view');
-    if (emailView != null) {
-      emailView.remove();
-    }
-    emailView = document.createElement('div');
-    emailView.id = 'email_view';
-    emailView.classList.add('col-8');
-    emailView.classList.add('border-left');
-    document.querySelector('#mailbox-wrapper').appendChild(emailView);
+  fetch(`/emails/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify({
+        read: true
+    })
+  })
+  .then(() => {
+    fetch(`/emails/${id}`)
+    .then(response => response.json())
+    .then(email => {
+      document.querySelector(`#email${email.id}`).replaceWith(list_card_el(email));
   
-    const subject = document.createElement('h5');
-    const from = document.createElement('p');
-    const to = document.createElement('p');
-    const time = document.createElement('p');
-    const body = document.createElement('p');
-    
-    subject.id = 'subject';
-    from.id = 'from';
-    to.id = 'to';
-    time.id = 'time';
-    body.id = 'body';
+      // Remove all active attributes and set for the current card
+      document.querySelectorAll(`button.active`).forEach(el => {
+        el.classList.remove('active');
+      })
+      document.querySelector(`#email${email.id}`).classList.add('active')
 
-    subject.innerHTML = email.subject;
-    from.innerHTML = `From: ${email.sender}`;
-    to.innerHTML = `To: ${email.recipients}`;
-    time.innerHTML = email.timestamp;
-    body.innerHTML = email.body;
-
-    emailView.appendChild(subject);
-    emailView.appendChild(from);
-    emailView.appendChild(to);
-    emailView.appendChild(time);
-    emailView.appendChild(body);
+      let emailView = document.querySelector('#email_view');
+      if (emailView != null) {
+        emailView.remove();
+      }
+      document.querySelector('#mailbox-wrapper').appendChild(email_view_el(email));
     
+    });
   })
   .catch(error => console.log(error));
-};
+}

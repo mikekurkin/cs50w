@@ -1,3 +1,19 @@
 textarea {
     min-height: 400px;
 }
+
+button.list-group-item {
+    background-color: #f4f4f4;
+    filter: opacity(80%);
+}
+
+button.unread-item {
+    font-weight: bold;
+    background-color: #fff;
+    filter: none;
+}
+
+button.active {
+    filter: none;
+}
+
