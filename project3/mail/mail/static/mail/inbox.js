@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', function() {
   document.querySelector('#inbox').addEventListener('click', () => load_mailbox('inbox'));
   document.querySelector('#sent').addEventListener('click', () => load_mailbox('sent'));
   document.querySelector('#archived').addEventListener('click', () => load_mailbox('archive'));
-  document.querySelector('#compose').addEventListener('click', compose_email);
+  document.querySelector('#compose').addEventListener('click', () => compose_email());
 
   document.querySelector('#compose-form').onsubmit = post_email;
 
@@ -21,7 +21,7 @@ function compose_email(reply_email=null) {
   // document.querySelector('#compose-view').style.display = 'block';
   document.querySelector('#emails-view').setAttribute('hidden', true);
   document.querySelector('#compose-view').removeAttribute('hidden');
-
+  console.log(reply_email)
   if (reply_email === null) {
     // Clear out composition fields
     document.querySelector('#compose-recipients').value = '';
@@ -107,7 +107,7 @@ function list_card_el(email) {
 function email_view_el(email) {
   emailView = document.createElement('div');
   emailView.id = 'email_view';
-  emailView.classList.add('col-8');
+  emailView.classList.add('col-md-8');
   emailView.classList.add('border');
   emailView.classList.add('rounded');
 
@@ -157,7 +157,10 @@ function load_mailbox(mailbox) {
   document.querySelector('#compose-view').setAttribute('hidden', true);
 
   // Show the mailbox name
-  document.querySelector('#emails-view').innerHTML = `<h3>${mailbox.charAt(0).toUpperCase() + mailbox.slice(1)}</h3>`;
+  document.querySelector('#emails-view').innerHTML = `<a class="text-dark text-decoration-none" id="mailbox-title" href="#"><h3>${mailbox.charAt(0).toUpperCase() + mailbox.slice(1)}</h3></a>`;
+  document.querySelector('#mailbox-title').addEventListener('click', () => {
+    load_mailbox(mailbox);
+  })
 
   current_mailbox = mailbox;
   // Get the list of e-mails
@@ -203,6 +206,7 @@ function load_email(id) {
       if (emailView != null) {
         emailView.remove();
       }
+      document.querySelector(`#mailbox`).classList.add('d-none');
       document.querySelector('#mailbox-wrapper').appendChild(email_view_el(email));
     
     });
@@ -232,8 +236,12 @@ function mailbox_wrapper_el() {
   mailboxWrapper.classList.add('row');
   const mailbox = document.createElement('div');
   mailbox.id = 'mailbox';
-  mailbox.classList.add('col');
+  mailbox.classList.add('col-md');
+  mailbox.classList.add('d-md-block');
+  mailbox.classList.add('px-md-3');
+  mailbox.classList.add('px-0');
   mailbox.classList.add('list-group');
+  mailbox.classList.add('flex-shrink');
   
   mailboxWrapper.appendChild(mailbox);
 
