@@ -3,7 +3,8 @@ document.addEventListener('DOMContentLoaded', function() {
   // Use buttons to toggle between views
   document.querySelector('#inbox').addEventListener('click', () => load_mailbox('inbox'));
   document.querySelector('#sent').addEventListener('click', () => load_mailbox('sent'));
-  document.querySelector('#archived').addEventListener('click', () => load_mailbox('archive'));
+  document.querySelector('#archived').id = 'archive' // For navigation based on mailbox name
+  document.querySelector('#archive').addEventListener('click', () => load_mailbox('archive'));
   document.querySelector('#compose').addEventListener('click', () => compose_email());
 
   document.querySelector('#compose-form').onsubmit = post_email;
@@ -15,6 +16,12 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function compose_email(reply_email=null) {
+  document.querySelectorAll('.container button.active').forEach(el => {
+    el.classList.remove('active');
+  })
+  if (document.querySelector('#compose') != null) {
+    document.querySelector('#compose').classList.add('active')
+  }
 
   // Show compose view and hide other views
   // document.querySelector('#emails-view').style.display = 'none';
@@ -149,6 +156,12 @@ function email_view_el(email) {
 } 
 
 function load_mailbox(mailbox) {
+  document.querySelectorAll('.container button.active').forEach(el => {
+    el.classList.remove('active');
+  })
+  if (document.querySelector(`#${mailbox}`) != null) {
+    document.querySelector(`#${mailbox}`).classList.add('active')
+  }
   
   // Show the mailbox and hide other views
   // document.querySelector('#emails-view').style.display = 'block';
@@ -157,10 +170,21 @@ function load_mailbox(mailbox) {
   document.querySelector('#compose-view').setAttribute('hidden', true);
 
   // Show the mailbox name
-  document.querySelector('#emails-view').innerHTML = `<a class="text-dark text-decoration-none" id="mailbox-title" href="#"><h3>${mailbox.charAt(0).toUpperCase() + mailbox.slice(1)}</h3></a>`;
-  document.querySelector('#mailbox-title').addEventListener('click', () => {
-    load_mailbox(mailbox);
+  const mailboxTitle = document.createElement('div')
+  mailboxTitle.id = 'mailbox-title'
+  mailboxTitle.innerHTML = `<a class="text-dark text-decoration-none" href="#"><h3>${mailbox.charAt(0).toUpperCase() + mailbox.slice(1)}</h3></a>`;
+  mailboxTitle.addEventListener('click', () => {
+    load_mailbox(mailbox)
   })
+  if (document.querySelector('#mailbox-title') === null) {
+    document.querySelector('#emails-view').appendChild(mailboxTitle)
+  } else {
+    document.querySelector('#mailbox-title').replaceWith(mailboxTitle)
+  }
+  // document.querySelector('#emails-view').innerHTML = `<a class="text-dark text-decoration-none" href="#"><h3>${mailbox.charAt(0).toUpperCase() + mailbox.slice(1)}</h3></a>`;
+  // document.querySelector('#mailbox-title').addEventListener('click', () => {
+  //   load_mailbox(mailbox);
+  // })
 
   current_mailbox = mailbox;
   // Get the list of e-mails
@@ -168,12 +192,18 @@ function load_mailbox(mailbox) {
   .then(response => response.json())
   .then(emails => {
     console.log(emails.length);
+    // document.querySelector('#emails-view').appendChild(mailbox_wrapper_el());
+    if (document.querySelector('#mailbox-wrapper') === null) {
+      document.querySelector('#emails-view').appendChild(mailbox_wrapper_el())
+    } else {
+      document.querySelector('#mailbox-wrapper').replaceWith(mailbox_wrapper_el())
+    }
 
     // Show list of e-mails
     if (emails.length > 0) {
       
-      document.querySelector('#emails-view').appendChild(mailbox_wrapper_el());
-    
+      
+
       emails.forEach(email => {
         document.querySelector('#mailbox').appendChild(list_card_el(email));
       });
@@ -197,7 +227,7 @@ function load_email(id) {
       document.querySelector(`#email${email.id}`).replaceWith(list_card_el(email));
   
       // Remove all active attributes and set for the current card
-      document.querySelectorAll(`button.active`).forEach(el => {
+      document.querySelectorAll('#mailbox button.active').forEach(el => {
         el.classList.remove('active');
       })
       document.querySelector(`#email${email.id}`).classList.add('active');
@@ -241,7 +271,6 @@ function mailbox_wrapper_el() {
   mailbox.classList.add('px-md-3');
   mailbox.classList.add('px-0');
   mailbox.classList.add('list-group');
-  mailbox.classList.add('flex-shrink');
   
   mailboxWrapper.appendChild(mailbox);
 
