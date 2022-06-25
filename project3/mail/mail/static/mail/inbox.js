@@ -101,11 +101,20 @@ function list_card_el(email) {
   e.classList.add('list-group-item');
   e.classList.add('list-group-item-action');
   e.innerHTML = `
+    <div class="row">
+    <div id="mark" class="px-2 text-align-center">
+    </div>
+    <div>
     <h5 class="mb-1">${email.sender}</h5>
     <p class="mb-1">${email.subject}</p>
-    <small>${email.timestamp}</small>
+    <small class="font-italic">${email.timestamp}</small>
+    </div>
+    </div>
   `;
-  if (email.read === false) {e.classList.add('unread-item')}
+  if (email.read === false) {
+    e.classList.add('unread-item');
+    e.querySelector('#mark').innerHTML = '<small class="bi bi-circle-fill text-primary"></i>'
+  }
   e.addEventListener('click', () => load_email(email.id));
   return e;
 }
