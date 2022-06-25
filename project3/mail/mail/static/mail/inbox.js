@@ -1,9 +1,8 @@
-document.addEventListener('DOMContentLoaded', function() {
-
+document.addEventListener('DOMContentLoaded', function () {
   // Use buttons to toggle between views
   document.querySelector('#inbox').addEventListener('click', () => load_mailbox('inbox'));
   document.querySelector('#sent').addEventListener('click', () => load_mailbox('sent'));
-  document.querySelector('#archived').id = 'archive' // For navigation based on mailbox name
+  document.querySelector('#archived').id = 'archive'; // For navigation based on mailbox name
   document.querySelector('#archive').addEventListener('click', () => load_mailbox('archive'));
   document.querySelector('#compose').addEventListener('click', () => compose_email());
 
@@ -14,12 +13,12 @@ document.addEventListener('DOMContentLoaded', function() {
   load_mailbox(current_mailbox);
 });
 
-function compose_email(reply_email=null) {
+function compose_email(reply_email = null) {
   document.querySelectorAll('.container button.active').forEach(el => {
     el.classList.remove('active');
-  })
+  });
   if (document.querySelector('#compose') != null) {
-    document.querySelector('#compose').classList.add('active')
+    document.querySelector('#compose').classList.add('active');
   }
 
   // Show compose view and hide other views
@@ -34,7 +33,7 @@ function compose_email(reply_email=null) {
   } else {
     // Pre-fill fields from reply email
     document.querySelector('#compose-recipients').value = reply_email.sender;
-    if (reply_email.subject.slice(0,3).toLowerCase() != 're:') {
+    if (reply_email.subject.slice(0, 3).toLowerCase() != 're:') {
       document.querySelector('#compose-subject').value = `Re: ${reply_email.subject}`;
     } else {
       document.querySelector('#compose-subject').value = `${reply_email.subject}`;
@@ -57,9 +56,9 @@ ${reply_email.body}`;
 
 function post_email() {
   // Get values from fields
-  const recipients = document.querySelector('#compose-recipients').value
-  const subject = document.querySelector('#compose-subject').value
-  const body = document.querySelector('#compose-body').value
+  const recipients = document.querySelector('#compose-recipients').value;
+  const subject = document.querySelector('#compose-subject').value;
+  const body = document.querySelector('#compose-body').value;
   
   // Send request
   fetch('/emails', {
@@ -67,18 +66,18 @@ function post_email() {
     body: JSON.stringify({
       recipients: recipients,
       subject: subject,
-      body: body
-    })
+      body: body,
+    }),
   })
   .then(response => response.json())
   .then(result => {
     if (result.error != undefined) {
       // Present error if API request has one
-      const alertEl = document.createElement('div')
-      alertEl.id = 'form_alert'
-      alertEl.classList.add('alert')
-      alertEl.classList.add('alert-danger')
-      alertEl.innerHTML = result.error
+        const alertEl = document.createElement('div');
+        alertEl.id = 'form_alert';
+        alertEl.classList.add('alert');
+        alertEl.classList.add('alert-danger');
+        alertEl.innerHTML = result.error;
       const formAlert = document.querySelector('#form_alert');
       if (formAlert != null) {
         formAlert.remove();
@@ -88,7 +87,7 @@ function post_email() {
       // If no error show sent inbox
       load_mailbox('sent');
     } 
-  })
+    });
   
   return false;
 }
@@ -97,9 +96,9 @@ function load_mailbox(mailbox) {
   // Remove all active button attributes and set for the current mailbox
   document.querySelectorAll('.container button.active').forEach(el => {
     el.classList.remove('active');
-  })
+  });
   if (document.querySelector(`#${mailbox}`) != null) {
-    document.querySelector(`#${mailbox}`).classList.add('active')
+    document.querySelector(`#${mailbox}`).classList.add('active');
   }
   
   // Show the mailbox and hide other views
@@ -112,9 +111,9 @@ function load_mailbox(mailbox) {
   mailboxTitle.innerHTML = `<a class="text-dark text-decoration-none" href="#"><h3>${mailbox.charAt(0).toUpperCase() + mailbox.slice(1)}</h3></a>`;
   mailboxTitle.addEventListener('click', () => {load_mailbox(mailbox)})
   if (document.querySelector('#mailbox-title') === null) {
-    document.querySelector('#emails-view').appendChild(mailboxTitle)
+    document.querySelector('#emails-view').appendChild(mailboxTitle);
   } else {
-    document.querySelector('#mailbox-title').replaceWith(mailboxTitle)
+    document.querySelector('#mailbox-title').replaceWith(mailboxTitle);
   }
 
   current_mailbox = mailbox;
@@ -124,9 +123,9 @@ function load_mailbox(mailbox) {
   .then(response => response.json())
   .then(emails => {
     if (document.querySelector('#mailbox-wrapper') === null) {
-      document.querySelector('#emails-view').appendChild(mailbox_wrapper_el())
+        document.querySelector('#emails-view').appendChild(mailbox_wrapper_el());
     } else {
-      document.querySelector('#mailbox-wrapper').replaceWith(mailbox_wrapper_el())
+        document.querySelector('#mailbox-wrapper').replaceWith(mailbox_wrapper_el());
     }
 
     // Show list of e-mails
@@ -134,7 +133,7 @@ function load_mailbox(mailbox) {
       emails.forEach(email => {
         document.querySelector('#mailbox').appendChild(list_card_el(email));
       });
-    };
+      }
   })
   .catch(error => console.log(error));
 }
@@ -144,8 +143,8 @@ function load_email(id) {
   fetch(`/emails/${id}`, {
     method: 'PUT',
     body: JSON.stringify({
-        read: true
-    })
+      read: true,
+    }),
   })
   .then(() => {
     // Load the email
@@ -157,10 +156,9 @@ function load_email(id) {
       // Remove all active card attributes and set for the current card
       document.querySelectorAll('#mailbox button.active').forEach(el => {
         el.classList.remove('active');
-      })
+          });
       document.querySelector(`#email${email.id}`).classList.add('active');
 
-      
       // Hide mailbox column on small screens
       document.querySelector(`#mailbox`).classList.add('d-none');
 
@@ -176,13 +174,13 @@ function load_email(id) {
   .catch(error => console.log(error));
 }
 
-function set_archived(email_id, value=true) {
+function set_archived(email_id, value = true) {
   // Send request to set archived property true or false
   fetch(`/emails/${email_id}`, {
     method: 'PUT',
     body: JSON.stringify({
-        archived: value
-    })
+      archived: value,
+    }),
   })
   .then(() => {
     load_mailbox('inbox');
@@ -213,7 +211,7 @@ function list_card_el(email) {
   `;
   if (email.read === false) {
     e.classList.add('unread-item');
-    e.querySelector('#mark').innerHTML = '<small class="bi bi-circle-fill text-primary"></i>'
+    e.querySelector('#mark').innerHTML = '<small class="bi bi-circle-fill text-primary"></i>';
   }
   e.addEventListener('click', () => load_email(email.id));
   return e;
@@ -243,7 +241,7 @@ function email_view_el(email) {
     </div>
     <hr class="mx-n3" />
     <p id="email-body">${email.body}</p>
-  `
+  `;
   emailView.querySelector('#archive').addEventListener('click', () => {
     set_archived(email.id, true);
   });
@@ -255,18 +253,18 @@ function email_view_el(email) {
   });
 
   if (email.archived || current_mailbox === 'sent') {
-    emailView.querySelector('#archive').remove()
+    emailView.querySelector('#archive').remove();
   }
   if (!email.archived || current_mailbox === 'sent') {
-    emailView.querySelector('#unarchive').remove()
+    emailView.querySelector('#unarchive').remove();
   }
 
-  return emailView
+  return emailView;
 } 
 
 // Returns mailbox wrapper structure element
 function mailbox_wrapper_el() {
-  const mailboxWrapper = document.createElement('div')
+  const mailboxWrapper = document.createElement('div');
   mailboxWrapper.id = 'mailbox-wrapper';
   mailboxWrapper.classList.add('row');
   const mailbox = document.createElement('div');
