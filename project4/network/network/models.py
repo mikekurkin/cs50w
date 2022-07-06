@@ -20,6 +20,9 @@ class Post(models.Model):
         related_name="liked_posts",
         editable=True)
 
+    class Meta:
+        ordering = ['-timestamp']
+
 
 class FollowRelationship(models.Model):
     follower = models.ForeignKey("User", on_delete=models.CASCADE, related_name="following_relationships")
