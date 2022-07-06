@@ -5,9 +5,10 @@ from . import views
 
 urlpatterns = [
     path("", views.index, name="index"),
-    path("login", views.login_view, name="login"),
-    path("logout", views.logout_view, name="logout"),
-    path("register", views.register, name="register"),
+    path("<int:n>/", views.index, name="index"),
+    path("login/", views.login_view, name="login"),
+    path("logout/", views.logout_view, name="logout"),
+    path("register/", views.register, name="register"),
     path("api/posts/p/<int:n>/", views.api_posts_page, name="api_posts_page"),
     path("api/posts/following/p/<int:n>/", views.api_following_posts_page, name="api_following_posts_page"),
     path("api/user/<int:user_id>/", views.api_user, name="api_user"),

@@ -15,8 +15,11 @@ from .models import User, Post
 PER_PAGE = 10
 
 
-def index(request):
-    return render(request, "network/index.html")
+def index(request, n=1):
+
+    return render(request, "network/index.html", {
+        "page": n,
+    })
 
 
 def login_view(request):
