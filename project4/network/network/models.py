@@ -9,6 +9,21 @@ class User(AbstractUser):
         through_fields=("follows", "follower"),
         related_name="following")
 
+    def serialize(self, verbose=False):
+        if verbose:
+            return {
+                "user_id": self.pk,
+                "username": self.username,
+                "date_joined": self.date_joined.strftime("%b %d %Y, %I:%M %p"),
+                "last_login": self.last_login.strftime("%b %d %Y, %I:%M %p"),
+                "followers_count": self.followers.count,
+                "following_count": self.following.count,
+            }
+        return {
+            "user_id": self.pk,
+            "username": self.username,
+        }
+
 
 class Post(models.Model):
     author = models.ForeignKey("User", on_delete=models.PROTECT, related_name="posts")
@@ -19,6 +34,15 @@ class Post(models.Model):
         through="Like",
         related_name="liked_posts",
         editable=True)
+
+    def serialize(self):
+        return {
+            "post_id": self.pk,
+            "author": self.author.serialize(),
+            "contents": self.contents,
+            "timestamp": self.timestamp.strftime("%b %d %Y, %I:%M %p"),
+            "likes_count": self.likes.count(),
+        }
 
     class Meta:
         ordering = ['-timestamp']

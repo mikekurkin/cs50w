@@ -14,7 +14,6 @@ urlpatterns = [
     path("api/user/<int:user_id>/", views.api_user, name="api_user"),
     path("api/user/<int:user_id>/posts/p/<int:n>/", views.api_user_posts_page, name="api_user_posts_page"),
     path("api/posts/<int:post_id>/", views.api_post_get, name="api_post_get"),
-    path("api/posts/<int:post_id>/likes/", views.api_post_likes, name="api_post_likes"),
     path("api/posts/<int:post_id>/edit/", views.api_post_edit, name="api_post_edit"),
     path("api/posts/new/", views.api_post_new, name="api_post_new"),
     path("api/posts/<int:post_id>/like/", views.api_post_like, name="api_post_like"),

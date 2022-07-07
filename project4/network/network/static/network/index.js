@@ -17,7 +17,7 @@ function loadPostsPage(n) {
         } else {
             // console.log(result.posts)
             removeAlert();
-            makePostsWrapper(JSON.parse(result.posts));
+            makePostsWrapper(result.posts);
         }
         makePaginator(result.pages, n);
     });
@@ -128,10 +128,10 @@ function postCardDiv(post) {
     postCard.classList.add("my-3");
     postCard.classList.add("post_card");
     postCard.innerHTML = 
-`<h5 class="card-header">${post.fields.author}</h5>
+`<h5 class="card-header">${post.author.username}</h5>
 <div class="card-body">
-  <p class="card-text">${post.fields.contents}</p>
-  <small class="text-muted font-italic">${post.fields.timestamp}</p>
+  <p class="card-text">${post.contents}</p>
+  <small class="text-muted font-italic">${post.timestamp}</small>
 </div>`;
     return postCard;
 }
