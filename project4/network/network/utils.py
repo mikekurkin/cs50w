@@ -41,5 +41,3 @@ def api_method_required(method):
             return func(request, *args, **kwargs)
         return wrapper
     return decorator
-
-

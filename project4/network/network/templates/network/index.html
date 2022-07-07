@@ -1,4 +1,6 @@
 {% extends "network/post_list.html" %}
+{% load static %}
 
-{% comment %} {% block body %}
-{% endblock %} {% endcomment %}
+{% block scripts %}
+    <script src="{% static 'network/index.js' %}"></script>
+{% endblock %}

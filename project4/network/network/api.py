@@ -9,7 +9,6 @@ from .models import User, Post
 @api_method_required("GET")
 def api_posts_page(request, n=1):
     page = get_posts_page(Post.objects.all(), n)
-    print(page)
     return JsonResponse(page, status=(404 if page.get('error') else 200))
 
 

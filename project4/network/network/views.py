@@ -7,11 +7,8 @@ from django.urls import reverse
 from .models import User
 
 
-def index(request, n=1):
-
-    return render(request, "network/index.html", {
-        "page": n,
-    })
+def index(request):
+    return render(request, "network/index.html")
 
 
 def login_view(request):
