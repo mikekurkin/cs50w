@@ -1,12 +1,23 @@
 window.addEventListener('popstate', e => showPage(e.state.p));
 
-function goToPage(p, route = '') {
-  showPage(p, (route = route));
+var apiRoute = '';
+
+function getPageNumber() {
+  const urlParams = new URLSearchParams(window.location.search);
+  var p = 1;
+  if (urlParams.has('p')) {
+    p = parseInt(urlParams.get('p'));
+  }
+  return p
+}
+
+function goToPage(p) {
+  showPage(p);
   history.pushState({ p }, '', p === 1 ? window.location.pathname : `?p=${p}`);
 }
 
-function showPage(p, route = '') {
-  fetch(`/api/posts/${route}p/${p}`)
+function showPage(p) {
+  fetch(`/api/posts/${apiRoute}p/${p}/`)
     .then(response => response.json())
     .then(result => {
       if (result.error != undefined) {
@@ -64,8 +75,6 @@ function makePaginator(total, current) {
   pagNav.appendChild(pagUl);
   pagUl.classList.add('pagination');
   pagUl.classList.add('justify-content-center');
-  
-  
 
   prevLi = document.createElement('li');
   prevLi.classList.add('page-item');

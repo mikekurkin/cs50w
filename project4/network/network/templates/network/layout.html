@@ -27,7 +27,7 @@
                 </li>
                 {% if user.is_authenticated %}
                     <li class="nav-item {% block following-active %}{% endblock %}">
-                        <a class="nav-link" href="#">Following</a>
+                        <a class="nav-link" href="/following/">Following</a>
                     </li>
                     <li class="nav-item {% block logout-active %}{% endblock %}">
                         <a class="nav-link" href="{% url 'logout' %}">Log Out</a>
