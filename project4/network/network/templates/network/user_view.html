@@ -1,0 +1,17 @@
+{% extends "network/layout.html" %}
+{% load static %}
+
+{% comment %} {% block following-active %}active{% endblock %} {% endcomment %}
+
+{% block scripts %}
+    <script type="text/javascript">
+        const user_id = {{ user_id }};
+    </script>
+    <script src="{% static 'network/user_view.js' %}"></script>
+{% endblock %}
+
+{% block body %}
+    <h2 id="heading"></h2>
+    <div id="posts"></div>
+    <div id="pages"></div>
+{% endblock %}

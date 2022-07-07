@@ -16,8 +16,8 @@ class User(AbstractUser):
                 "username": self.username,
                 "date_joined": self.date_joined.strftime("%b %d %Y, %I:%M %p"),
                 "last_login": self.last_login.strftime("%b %d %Y, %I:%M %p"),
-                "followers_count": self.followers.count,
-                "following_count": self.following.count,
+                "followers_count": self.followers.count(),
+                "following_count": self.following.count(),
             }
         return {
             "user_id": self.pk,

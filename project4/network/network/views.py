@@ -15,6 +15,12 @@ def following(request):
     return render(request, "network/following.html")
 
 
+def user_view(request, user_id):
+    return render(request, "network/user_view.html", {
+        'user_id': user_id
+    })
+
+
 def login_view(request):
     if request.method == "POST":
 

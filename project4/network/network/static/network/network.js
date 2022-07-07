@@ -131,7 +131,7 @@ function postCardDiv(post) {
   postCard.classList.add('card');
   postCard.classList.add('my-3');
   postCard.classList.add('post_card');
-  postCard.innerHTML = `<h5 class="card-header">${post.author.username}</h5>
+  postCard.innerHTML = `<a class="h5 text-secondary card-header" href="/user/${post.author.user_id}/">${post.author.username}</a>
 <div class="card-body">
   <p class="card-text">${post.contents}</p>
   <small class="text-muted font-italic">${post.timestamp}</small>
