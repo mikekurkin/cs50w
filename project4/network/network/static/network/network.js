@@ -64,6 +64,8 @@ function makePaginator(total, current) {
   pagNav.appendChild(pagUl);
   pagUl.classList.add('pagination');
   pagUl.classList.add('justify-content-center');
+  
+  
 
   prevLi = document.createElement('li');
   prevLi.classList.add('page-item');

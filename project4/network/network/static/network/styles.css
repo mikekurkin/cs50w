@@ -1,0 +1,10 @@
+.pagination .page-link {
+    color: dimgrey;
+}
+.pagination .disabled .page-link {
+    color: #ccc;
+}
+.page-item.active .page-link {
+    border-color: grey;
+    background: #aaa;
+  }
