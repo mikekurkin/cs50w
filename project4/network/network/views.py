@@ -1,4 +1,5 @@
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
@@ -11,6 +12,7 @@ def index(request):
     return render(request, "network/index.html")
 
 
+@login_required
 def following(request):
     return render(request, "network/following.html")
 

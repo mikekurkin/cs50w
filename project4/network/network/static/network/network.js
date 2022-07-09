@@ -1,5 +1,7 @@
 window.addEventListener('popstate', e => showPage(e.state.p));
 
+const csrftoken = getCookie('csrftoken');
+
 var apiRoute = '';
 
 function getPageNumber() {
@@ -127,14 +129,121 @@ function makePaginator(total, current) {
 }
 
 function postCardDiv(post) {
-  postCard = document.createElement('div');
+  let postCard = document.createElement('div');
+  postCard.id = `post${post.post_id}`;
   postCard.classList.add('card');
   postCard.classList.add('my-3');
   postCard.classList.add('post_card');
-  postCard.innerHTML = `<a class="h5 text-secondary card-header" href="/user/${post.author.user_id}/">${post.author.username}</a>
+  postCard.innerHTML = `<div class="card-header row content-adjust-center mx-0">
+  <div class="col-auto">
+  <a class="h5 text-secondary" href="/user/${post.author.user_id}/">${post.author.username}</a>
+  </div>
+</div>
 <div class="card-body">
-  <p class="card-text">${post.contents}</p>
+  <p class="post-contents card-text mt-n1 mx-n1 mb-2 p-1">${post.contents}</p>
   <small class="text-muted font-italic">${post.timestamp}</small>
 </div>`;
+
+  if (post.can_edit) {
+    
+    postCard.querySelector(".card-header").appendChild(editBtnDiv(postCard));
+  }
   return postCard;
 }
+
+function editFormDiv(postDiv, newPost=true) {
+  let editDiv = postDiv.cloneNode(true)
+  const postContents = editDiv.querySelector(".post-contents");
+  const editButton = editDiv.querySelector(".edit-btn");
+  let saveButton = document.createElement('div');
+  const contentsBefore = postContents.innerHTML;
+  saveButton.innerHTML = '<a href="#" title="Save Post" class="small text-secondary bi bi-check2-square"></a>';
+  saveButton.querySelector('a').addEventListener('click', e => {
+    e.preventDefault();
+    finishEditing();
+  });
+  postContents.setAttribute('contentEditable', 'plaintext-only');
+  editButton.replaceWith(saveButton);
+
+  return editDiv;
+
+  function finishEditing() {
+    const post_id = parseInt(editDiv.id.split('post').pop());
+    const contents = editDiv.querySelector('.post-contents').innerHTML;
+    if (newPost === true) {
+      if (contents === "") {
+        makeAlert("No contents provided.");
+      } else {
+        
+      }
+    } else {
+      if (contents === contentsBefore) {
+        postContents.removeAttribute('contentEditable');
+        saveButton.replaceWith(editBtnDiv(editDiv));
+      } else {
+        saveEditedPost(post_id, contents)
+        .then(responsePost => {
+          removeAlert();
+          editDiv.replaceWith(postCardDiv(responsePost));
+        })
+        .catch(rej => makeAlert(rej.error));
+      }
+    }
+  }
+}
+
+function saveEditedPost(post_id, contents) {
+  return new Promise((resolve, reject) => {
+    fetch(`/api/posts/${post_id}/edit/`, {
+      method: 'PUT',
+      headers: {'X-CSRFToken': csrftoken},
+      mode: 'same-origin', // Do not send CSRF token to another domain.
+      body: JSON.stringify({
+        contents: contents
+      }),
+    })
+      .then(response => response.json())
+      .then(result => {
+        console.log(result);
+        if (result.error != undefined) {
+          reject(result);
+        } else {
+          resolve(result);
+        }
+      })
+      .catch(err => reject({error: err}));
+  })
+}
+
+function editBtnDiv(postCard) {
+  let editDiv = document.createElement('div');
+    editDiv.classList.add('col-auto');
+    editDiv.classList.add('edit-btn');
+    editDiv.classList.add('px-0');
+    editDiv.innerHTML = '<a href="#" title="Edit Post" class="small text-secondary bi bi-pencil"></a>';
+    editDiv.querySelector('a').addEventListener('click', e => {
+      e.preventDefault();
+      editDiv = editFormDiv(postCard, newPost=false)
+      postCard.replaceWith(editDiv);
+      editDiv.querySelector('.post-contents').focus();
+    })
+    return editDiv
+}
+
+function getCookie(name) {
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== '') {
+      const cookies = document.cookie.split(';');
+      for (let i = 0; i < cookies.length; i++) {
+          const cookie = cookies[i].trim();
+          // Does this cookie string begin with the name we want?
+          if (cookie.substring(0, name.length + 1) === (name + '=')) {
+              cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+              break;
+          }
+      }
+  }
+  return cookieValue;
+}
+
+

@@ -8,14 +8,14 @@ from .models import User, Post
 
 @api_method_required("GET")
 def api_posts_page(request, n=1):
-    page = get_posts_page(Post.objects.all(), n)
+    page = get_posts_page(Post.objects.all(), n, requester=request.user)
     return JsonResponse(page, status=(404 if page.get('error') else 200))
 
 
 @api_method_required("GET")
 @api_login_required
 def api_following_posts_page(request, n=1):
-    page = get_posts_page(Post.objects.filter(author__in=request.user.following.all()), n)
+    page = get_posts_page(Post.objects.filter(author__in=request.user.following.all()), n,  requester=request.user)
 
     return JsonResponse(page, status=(404 if page.get('error') else 200))
 
@@ -36,7 +36,7 @@ def api_user(request, user_id):
 
 @api_method_required("GET")
 def api_user_posts_page(request, user_id, n):
-    page = get_posts_page(Post.objects.filter(author__pk=user_id), n)
+    page = get_posts_page(Post.objects.filter(author__pk=user_id), n, requester=request.user)
 
     return JsonResponse(page, status=(404 if page.get('error') else 200))
 
@@ -50,7 +50,7 @@ def api_post_get(request, post_id):
             "error": str(e)
         }, status=404)
 
-    post_info = post.serialize()
+    post_info = post.serialize(requester=request.user)
 
     return JsonResponse(post_info)
 
@@ -80,7 +80,7 @@ def api_post_edit(request, post_id):
     post.contents = contents
     post.save()
 
-    post_info = post.serialize()
+    post_info = post.serialize(requester=request.user)
 
     return JsonResponse(post_info)
 
@@ -98,7 +98,7 @@ def api_post_new(request):
     post = Post(author=request.user, contents=contents)
     post.save()
 
-    post_info = post.serialize()
+    post_info = post.serialize(requester=request.user)
 
     return JsonResponse(post_info)
 
@@ -116,7 +116,7 @@ def api_post_like(request, post_id):
     post.liked_by.add(request.user)
     post.save()
 
-    post_info = post.serialize()
+    post_info = post.serialize(requester=request.user)
 
     return JsonResponse(post_info)
 
@@ -134,7 +134,7 @@ def api_post_unlike(request, post_id):
     post.liked_by.remove(request.user)
     post.save()
 
-    post_info = post.serialize()
+    post_info = post.serialize(requester=request.user)
 
     return JsonResponse(post_info)
 

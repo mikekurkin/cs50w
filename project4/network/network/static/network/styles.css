@@ -1,3 +1,5 @@
+@import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.3/font/bootstrap-icons.css");
+
 .pagination .page-link {
     color: dimgrey;
 }
@@ -8,3 +10,17 @@
     border-color: grey;
     background: #aaa;
   }
+
+.post-contents {
+    white-space: pre-wrap;
+}
+
+.post-contents[contentEditable] {
+    outline: none;
+    border: none;
+    box-shadow: 0 0 0 0.5pt grey;
+    border-radius: 2pt;
+}
+.post-contents[contentEditable]:focus {
+    box-shadow: 0 0 3pt 2pt cornflowerblue;
+}
