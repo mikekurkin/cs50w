@@ -88,7 +88,7 @@ def api_post_edit(request, post_id):
 @api_method_required("POST")
 @api_login_required
 def api_post_new(request):
-    contents = request.POST.get("contents")
+    contents = json.loads(request.body).get("contents")
 
     if contents is None:
         return JsonResponse({

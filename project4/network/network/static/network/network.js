@@ -34,13 +34,13 @@ function showPage(p) {
 
 function makePostsWrapper(posts) {
   const postsWrapperDiv = document.createElement('div');
-  postsWrapperDiv.id = 'posts_wrapper';
+  postsWrapperDiv.id = 'posts-wrapper';
 
   Array.from(posts).forEach(post => {
     postsWrapperDiv.appendChild(postCardDiv(post));
   });
 
-  const postsWrapper = document.querySelector('#posts_wrapper');
+  const postsWrapper = document.querySelector('#posts-wrapper');
   if (postsWrapper != null) {
     postsWrapper.replaceWith(postsWrapperDiv);
   } else {
@@ -50,11 +50,11 @@ function makePostsWrapper(posts) {
 
 function makeAlert(message) {
   const alertEl = document.createElement('div');
-  alertEl.id = 'body_alert';
+  alertEl.id = 'body-alert';
   alertEl.classList.add('alert');
   alertEl.classList.add('alert-danger');
   alertEl.innerHTML = message;
-  const formAlert = document.querySelector('#body_alert');
+  const formAlert = document.querySelector('#body-alert');
   if (formAlert != null) {
     formAlert.replaceWith(alertEl);
   } else {
@@ -63,7 +63,7 @@ function makeAlert(message) {
 }
 
 function removeAlert() {
-  const formAlert = document.querySelector('#body_alert');
+  const formAlert = document.querySelector('#body-alert');
   if (formAlert != null) {
     formAlert.remove();
   }
@@ -128,33 +128,37 @@ function makePaginator(total, current) {
   document.querySelector('#pages').appendChild(pagNav);
 }
 
-function postCardDiv(post) {
+function postCardDiv(post=null) {
   let postCard = document.createElement('div');
-  postCard.id = `post${post.post_id}`;
+  postCard.id = post !== null ? `post${post.post_id}` : 'new-post';
   postCard.classList.add('card');
   postCard.classList.add('my-3');
   postCard.classList.add('post_card');
   postCard.innerHTML = `<div class="card-header row content-adjust-center mx-0">
   <div class="col-auto">
-  <a class="h5 text-secondary" href="/user/${post.author.user_id}/">${post.author.username}</a>
+    <h5 class="text-dark my-0">New Post</h5>
   </div>
 </div>
 <div class="card-body">
-  <p class="post-contents card-text mt-n1 mx-n1 mb-2 p-1">${post.contents}</p>
-  <small class="text-muted font-italic">${post.timestamp}</small>
+  <p class="post-contents card-text mt-n1 mx-n1 mb-2 p-1"></p>
 </div>`;
 
-  if (post.can_edit) {
+  if (post !== null) {
+    postCard.querySelector('.card-header > div > h5').innerHTML = `<a class="text-secondary text-decoration-none" href="/user/${post.author.user_id}/">${post.author.username}</a>`;
+    postCard.querySelector('.card-body > p').innerHTML = post.contents;
+    postCard.querySelector('.card-body').innerHTML += `<small class="text-muted font-italic">${post.timestamp}</small>`;
     
-    postCard.querySelector(".card-header").appendChild(editBtnDiv(postCard));
+    if (post.can_edit) {
+      postCard.querySelector(".card-header").appendChild(editBtnDiv(postCard));
+    }
   }
+
   return postCard;
 }
 
 function editFormDiv(postDiv, newPost=true) {
   let editDiv = postDiv.cloneNode(true)
   const postContents = editDiv.querySelector(".post-contents");
-  const editButton = editDiv.querySelector(".edit-btn");
   let saveButton = document.createElement('div');
   const contentsBefore = postContents.innerHTML;
   saveButton.innerHTML = '<a href="#" title="Save Post" class="small text-secondary bi bi-check2-square"></a>';
@@ -163,20 +167,31 @@ function editFormDiv(postDiv, newPost=true) {
     finishEditing();
   });
   postContents.setAttribute('contentEditable', 'plaintext-only');
-  editButton.replaceWith(saveButton);
+  
+  if (newPost === true) {
+    editDiv.querySelector(".card-header").appendChild(saveButton);
+  } else {
+    const editButton = editDiv.querySelector(".edit-btn");
+    editButton.replaceWith(saveButton);
+  }
 
   return editDiv;
 
   function finishEditing() {
-    const post_id = parseInt(editDiv.id.split('post').pop());
-    const contents = editDiv.querySelector('.post-contents').innerHTML;
+    let contents = editDiv.querySelector('.post-contents').innerHTML;
     if (newPost === true) {
       if (contents === "") {
-        makeAlert("No contents provided.");
+        makeAlert("No contents provided!");
       } else {
-        
+        saveNewPost(contents)
+        .then(() => {
+          removeAlert();
+          showPage(1);
+        })
+        .catch(rej => makeAlert(rej.error));
       }
     } else {
+      const post_id = parseInt(editDiv.id.split('post').pop());
       if (contents === contentsBefore) {
         postContents.removeAttribute('contentEditable');
         saveButton.replaceWith(editBtnDiv(editDiv));
@@ -191,6 +206,31 @@ function editFormDiv(postDiv, newPost=true) {
     }
   }
 }
+
+
+function saveNewPost(contents) {
+  return new Promise((resolve, reject) => {
+    fetch(`/api/posts/new/`, {
+      method: 'POST',
+      headers: {'X-CSRFToken': csrftoken},
+      mode: 'same-origin', // Do not send CSRF token to another domain.
+      body: JSON.stringify({
+        contents: contents,
+      }),
+    })
+      .then(response => response.json())
+      .then(result => {
+        console.log(result);
+        if (result.error != undefined) {
+          reject(result);
+        } else {
+          resolve(result);
+        }
+      })
+      .catch(err => reject({error: err}));
+  })
+}
+
 
 function saveEditedPost(post_id, contents) {
   return new Promise((resolve, reject) => {
