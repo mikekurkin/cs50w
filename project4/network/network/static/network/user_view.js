@@ -6,9 +6,16 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function showUserInfo(user_id) {
-    fetch(`/api/user/${user_id}/`)
+  fetch(`/api/user/${user_id}/`)
     .then(response => response.json())
     .then(result => {
-        document.querySelector("#heading").innerHTML = `Posts by ${result.username}`;
+      console.log(result);
+      document.querySelector('#username').innerHTML = result.username;
+      document.querySelector('#followers h3').innerHTML = result.followers_count;
+      if (result.followers_count === 1) {
+        document.querySelector('#followers small').innerHTML = "follower";
+      }
+      document.querySelector('#following h3').innerHTML = result.following_count;
+      document.querySelector('#last_seen').innerHTML = result.last_login;
     });
 }
