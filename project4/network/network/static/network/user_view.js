@@ -11,6 +11,10 @@ function showUserInfo(user_id) {
     .then(result => {
       console.log(result);
       document.querySelector('#username').innerHTML = result.username;
+      document.querySelector('#posts-count h3').innerHTML = result.posts_count;
+      if (result.posts_count === 1) {
+        document.querySelector('#posts-count small').innerHTML = "post";
+      }
       document.querySelector('#followers h3').innerHTML = result.followers_count;
       if (result.followers_count === 1) {
         document.querySelector('#followers small').innerHTML = "follower";

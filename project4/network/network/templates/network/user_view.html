@@ -12,13 +12,22 @@
 
 {% block body %}
     <div class="row align-items-center justify-content-center mx-sm-3 my-4">
-        <div class="col-sm-6 col-md-5">
+        <div class="col-sm px-4 px-sm-1 py-3 py-sm-2">
         <div>
             <h1 id="username" class="my-0"></h2>
             <small class="text-muted font-italic">Last seen: <span id="last_seen"></span></small>
         </div>
         </div>
-        <div class="col-sm-auto">
+        <div class="row col-sm-6  flex-shrink-0">
+        <div class="col px-1">
+            <div id="posts-count" class="card text-center">
+                <div class="card-body p-2">
+                <h3 class="card-title font-weight-bold m-0"></h3>
+                <small class="card-text">posts</small>
+                </div>
+            </div>
+        </div>
+        <div class="col px-1">
         <div id="followers" class="card text-center">
             <div class="card-body p-2">
             <h3 class="card-title font-weight-bold m-0"></h3>
@@ -26,14 +35,15 @@
             </div>
         </div>
         </div>
-        <div class="col-sm-auto">
+        <div class="col px-1">
         <div id="following" class="card text-center">
             <div class="card-body p-2">
             <h3 class="card-title font-weight-bold m-0"></h3>
             <small class="card-text">following</small>
             </div>
         </div>
-    </div>
+        </div>
+        </div>
     </div>
     <div id="posts" class=""></div>
     <div id="pages"></div>
