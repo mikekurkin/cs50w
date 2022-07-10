@@ -9,21 +9,26 @@ class User(AbstractUser):
         through_fields=("follows", "follower"),
         related_name="following")
 
-    def serialize(self, verbose=False):
+    def serialize(self, verbose=False, requester=None):
+        res = {
+            "user_id": self.pk,
+            "username": self.username,
+        }
         if verbose:
-            return {
-                "user_id": self.pk,
-                "username": self.username,
+            res.update({
                 "date_joined": self.date_joined.strftime("%b %d %Y, %I:%M %p"),
                 "last_login": self.last_login.strftime("%b %d %Y, %I:%M %p"),
                 "posts_count": self.posts.count(),
                 "followers_count": self.followers.count(),
                 "following_count": self.following.count(),
-            }
-        return {
-            "user_id": self.pk,
-            "username": self.username,
-        }
+            })
+        if requester is not None:
+            res["is_following"] = \
+                None if not requester.is_authenticated or requester == self \
+                else True if requester in self.followers.all() \
+                else False
+
+        return res
 
 
 class Post(models.Model):
@@ -45,8 +50,13 @@ class Post(models.Model):
             "likes_count": self.likes.count(),
         }
         if requester is not None:
-            res["can_edit"] = True if requester == self.author and requester.is_authenticated else False
-            res["is_liked"] = None if not requester.is_authenticated else True if requester in self.liked_by.all() else False
+            res["can_edit"] = \
+                True if requester == self.author and requester.is_authenticated \
+                else False
+            res["is_liked"] = \
+                None if not requester.is_authenticated \
+                else True if requester in self.liked_by.all() \
+                else False
         return res
 
     class Meta:

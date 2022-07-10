@@ -29,7 +29,7 @@ def api_user(request, user_id):
             "error": str(e)
         }, status=404)
 
-    user_info = user.serialize(verbose=True)
+    user_info = user.serialize(verbose=True, requester=request.user)
 
     return JsonResponse(user_info)
 
@@ -143,8 +143,8 @@ def api_post_unlike(request, post_id):
 @api_login_required
 def api_user_follow(request, user_id):
     try:
-        user = Post.objects.get(pk=user_id)
-    except Post.DoesNotExist as e:
+        user = User.objects.get(pk=user_id)
+    except User.DoesNotExist as e:
         return JsonResponse({
             "error": str(e)
         }, status=404)
@@ -152,7 +152,7 @@ def api_user_follow(request, user_id):
     user.followers.add(request.user)
     user.save()
 
-    user_info = user.serialize(verbose=True)
+    user_info = user.serialize(verbose=True, requester=request.user)
 
     return JsonResponse(user_info)
 
@@ -161,8 +161,8 @@ def api_user_follow(request, user_id):
 @api_login_required
 def api_user_unfollow(request, user_id):
     try:
-        user = Post.objects.get(pk=user_id)
-    except Post.DoesNotExist as e:
+        user = User.objects.get(pk=user_id)
+    except User.DoesNotExist as e:
         return JsonResponse({
             "error": str(e)
         }, status=404)
@@ -170,6 +170,6 @@ def api_user_unfollow(request, user_id):
     user.followers.remove(request.user)
     user.save()
 
-    user_info = user.serialize(verbose=True)
+    user_info = user.serialize(verbose=True, requester=request.user)
 
     return JsonResponse(user_info)

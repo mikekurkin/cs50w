@@ -33,6 +33,14 @@
     color: red;
 }
 
+#follow-btn {
+    color: grey !important;
+}
+
+#follow-btn:hover > i, #follow-btn.active > i {
+    color: gold !important;
+}
+
 @media only screen {
     .container { max-width: 720px; }
 }

@@ -10,7 +10,7 @@ function getPageNumber() {
   if (urlParams.has('p')) {
     p = parseInt(urlParams.get('p'));
   }
-  return p
+  return p;
 }
 
 function goToPage(p) {
@@ -128,7 +128,7 @@ function makePaginator(total, current) {
   document.querySelector('#pages').appendChild(pagNav);
 }
 
-function postCardDiv(post=null) {
+function postCardDiv(post = null) {
   let postCard = document.createElement('div');
   postCard.id = post !== null ? `post${post.post_id}` : 'new-post';
   postCard.classList.add('card');
@@ -144,7 +144,9 @@ function postCardDiv(post=null) {
 </div>`;
 
   if (post !== null) {
-    postCard.querySelector('.card-header > div > h5').innerHTML = `<a class="text-secondary text-decoration-none" href="/user/${post.author.user_id}/">${post.author.username}</a>`;
+    postCard.querySelector(
+      '.card-header > div > h5'
+    ).innerHTML = `<a class="text-secondary text-decoration-none" href="/user/${post.author.user_id}/">${post.author.username}</a>`;
     postCard.querySelector('.card-body > p').innerHTML = post.contents;
     postCard.querySelector('.card-body').innerHTML += `
     <div class="row justify-content-between align-items-baseline mt-3">
@@ -158,49 +160,49 @@ function postCardDiv(post=null) {
       </div>
     </div>
     `;
-    const likeBtn = postCard.querySelector("#like-btn");
+    const likeBtn = postCard.querySelector('#like-btn');
     if (post.is_liked === true) {
       likeBtn.classList.add('active');
       likeBtn.querySelector('i').classList.remove('bi-heart');
       likeBtn.querySelector('i').classList.add('bi-heart-fill');
-      likeBtn.title = "Unlike";
+      likeBtn.title = 'Unlike';
       likeBtn.addEventListener('click', () => {
         unlikePost(post.post_id)
-        .then(resPost => {
-          removeAlert();
-          postCard.replaceWith(postCardDiv(resPost));
-        })
-        .catch(rej => makeAlert(rej.error));
-      })
+          .then(resPost => {
+            removeAlert();
+            postCard.replaceWith(postCardDiv(resPost));
+          })
+          .catch(rej => makeAlert(rej.error));
+      });
     } else if (post.is_liked === false) {
       likeBtn.addEventListener('click', () => {
         likePost(post.post_id)
-        .then(resPost => {
-          removeAlert();
-          postCard.replaceWith(postCardDiv(resPost));
-        })
-        .catch(rej => makeAlert(rej.error));
-      })
+          .then(resPost => {
+            removeAlert();
+            postCard.replaceWith(postCardDiv(resPost));
+          })
+          .catch(rej => makeAlert(rej.error));
+      });
     } else if (post.is_liked === null) {
       likeBtn.setAttribute('disabled', 'true');
     }
     if (post.likes_count > 0) {
       let likesCount = document.createElement('span');
-      likesCount.classList.add('ml-1')
+      likesCount.classList.add('ml-1');
       likesCount.innerHTML = post.likes_count;
       likeBtn.append(likesCount);
     }
     if (post.can_edit) {
-      postCard.querySelector(".card-header").appendChild(editBtnDiv(postCard));
+      postCard.querySelector('.card-header').appendChild(editBtnDiv(postCard));
     }
   }
 
   return postCard;
 }
 
-function editFormDiv(postDiv, newPost=true) {
-  let editDiv = postDiv.cloneNode(true)
-  const postContents = editDiv.querySelector(".post-contents");
+function editFormDiv(postDiv, newPost = true) {
+  let editDiv = postDiv.cloneNode(true);
+  const postContents = editDiv.querySelector('.post-contents');
   let saveButton = document.createElement('div');
   const contentsBefore = postContents.innerHTML;
   saveButton.innerHTML = '<a href="#" title="Save Post" class="small text-secondary bi bi-check2-square"></a>';
@@ -209,11 +211,11 @@ function editFormDiv(postDiv, newPost=true) {
     finishEditing();
   });
   postContents.setAttribute('contentEditable', 'plaintext-only');
-  
+
   if (newPost === true) {
-    editDiv.querySelector(".card-header").appendChild(saveButton);
+    editDiv.querySelector('.card-header').appendChild(saveButton);
   } else {
-    const editButton = editDiv.querySelector(".edit-btn");
+    const editButton = editDiv.querySelector('.edit-btn');
     editButton.replaceWith(saveButton);
   }
 
@@ -222,15 +224,15 @@ function editFormDiv(postDiv, newPost=true) {
   function finishEditing() {
     let contents = editDiv.querySelector('.post-contents').innerHTML;
     if (newPost === true) {
-      if (contents === "") {
-        makeAlert("No contents provided!");
+      if (contents === '') {
+        makeAlert('No contents provided!');
       } else {
         saveNewPost(contents)
-        .then(() => {
-          removeAlert();
-          showPage(1);
-        })
-        .catch(rej => makeAlert(rej.error));
+          .then(() => {
+            removeAlert();
+            showPage(1);
+          })
+          .catch(rej => makeAlert(rej.error));
       }
     } else {
       const post_id = parseInt(editDiv.id.split('post').pop());
@@ -239,22 +241,21 @@ function editFormDiv(postDiv, newPost=true) {
         saveButton.replaceWith(editBtnDiv(editDiv));
       } else {
         saveEditedPost(post_id, contents)
-        .then(responsePost => {
-          removeAlert();
-          editDiv.replaceWith(postCardDiv(responsePost));
-        })
-        .catch(rej => makeAlert(rej.error));
+          .then(responsePost => {
+            removeAlert();
+            editDiv.replaceWith(postCardDiv(responsePost));
+          })
+          .catch(rej => makeAlert(rej.error));
       }
     }
   }
 }
 
-
 function saveNewPost(contents) {
   return new Promise((resolve, reject) => {
     fetch(`/api/posts/new/`, {
       method: 'POST',
-      headers: {'X-CSRFToken': csrftoken},
+      headers: { 'X-CSRFToken': csrftoken },
       mode: 'same-origin', // Do not send CSRF token to another domain.
       body: JSON.stringify({
         contents: contents,
@@ -269,19 +270,18 @@ function saveNewPost(contents) {
           resolve(result);
         }
       })
-      .catch(err => reject({error: err}));
-  })
+      .catch(err => reject({ error: err }));
+  });
 }
-
 
 function saveEditedPost(post_id, contents) {
   return new Promise((resolve, reject) => {
     fetch(`/api/posts/${post_id}/edit/`, {
       method: 'PUT',
-      headers: {'X-CSRFToken': csrftoken},
+      headers: { 'X-CSRFToken': csrftoken },
       mode: 'same-origin', // Do not send CSRF token to another domain.
       body: JSON.stringify({
-        contents: contents
+        contents: contents,
       }),
     })
       .then(response => response.json())
@@ -293,30 +293,30 @@ function saveEditedPost(post_id, contents) {
           resolve(result);
         }
       })
-      .catch(err => reject({error: err}));
-  })
+      .catch(err => reject({ error: err }));
+  });
 }
 
 function editBtnDiv(postCard) {
   let editDiv = document.createElement('div');
-    editDiv.classList.add('col-auto');
-    editDiv.classList.add('edit-btn');
-    editDiv.classList.add('px-0');
-    editDiv.innerHTML = '<a href="#" title="Edit Post" class="small text-secondary bi bi-pencil"></a>';
-    editDiv.querySelector('a').addEventListener('click', e => {
-      e.preventDefault();
-      editDiv = editFormDiv(postCard, newPost=false)
-      postCard.replaceWith(editDiv);
-      editDiv.querySelector('.post-contents').focus();
-    })
-    return editDiv
+  editDiv.classList.add('col-auto');
+  editDiv.classList.add('edit-btn');
+  editDiv.classList.add('px-0');
+  editDiv.innerHTML = '<a href="#" title="Edit Post" class="small text-secondary bi bi-pencil"></a>';
+  editDiv.querySelector('a').addEventListener('click', e => {
+    e.preventDefault();
+    editDiv = editFormDiv(postCard, (newPost = false));
+    postCard.replaceWith(editDiv);
+    editDiv.querySelector('.post-contents').focus();
+  });
+  return editDiv;
 }
 
 function likePost(post_id) {
   return new Promise((resolve, reject) => {
     fetch(`/api/posts/${post_id}/like/`, {
       method: 'POST',
-      headers: {'X-CSRFToken': csrftoken},
+      headers: { 'X-CSRFToken': csrftoken },
       mode: 'same-origin',
     })
       .then(response => response.json())
@@ -328,15 +328,15 @@ function likePost(post_id) {
           resolve(result);
         }
       })
-      .catch(err => reject({error: err}));
-  })
+      .catch(err => reject({ error: err }));
+  });
 }
 
 function unlikePost(post_id) {
   return new Promise((resolve, reject) => {
     fetch(`/api/posts/${post_id}/unlike/`, {
       method: 'POST',
-      headers: {'X-CSRFToken': csrftoken},
+      headers: { 'X-CSRFToken': csrftoken },
       mode: 'same-origin',
     })
       .then(response => response.json())
@@ -348,24 +348,62 @@ function unlikePost(post_id) {
           resolve(result);
         }
       })
-      .catch(err => reject({error: err}));
-  })
+      .catch(err => reject({ error: err }));
+  });
+}
+
+function followUser(user_id) {
+  return new Promise((resolve, reject) => {
+    fetch(`/api/user/${user_id}/follow/`, {
+      method: 'POST',
+      headers: { 'X-CSRFToken': csrftoken },
+      mode: 'same-origin',
+    })
+      .then(response => response.json())
+      .then(result => {
+        console.log(result);
+        if (result.error != undefined) {
+          reject(result);
+        } else {
+          resolve(result);
+        }
+      })
+      .catch(err => reject({ error: err }));
+  });
+}
+
+function unfollowUser(user_id) {
+  return new Promise((resolve, reject) => {
+    fetch(`/api/user/${user_id}/unfollow/`, {
+      method: 'POST',
+      headers: { 'X-CSRFToken': csrftoken },
+      mode: 'same-origin',
+    })
+      .then(response => response.json())
+      .then(result => {
+        console.log(result);
+        if (result.error != undefined) {
+          reject(result);
+        } else {
+          resolve(result);
+        }
+      })
+      .catch(err => reject({ error: err }));
+  });
 }
 
 function getCookie(name) {
   let cookieValue = null;
   if (document.cookie && document.cookie !== '') {
-      const cookies = document.cookie.split(';');
-      for (let i = 0; i < cookies.length; i++) {
-          const cookie = cookies[i].trim();
-          // Does this cookie string begin with the name we want?
-          if (cookie.substring(0, name.length + 1) === (name + '=')) {
-              cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-              break;
-          }
+    const cookies = document.cookie.split(';');
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim();
+      // Does this cookie string begin with the name we want?
+      if (cookie.substring(0, name.length + 1) === name + '=') {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
       }
+    }
   }
   return cookieValue;
 }
-
-
