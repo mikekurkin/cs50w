@@ -146,8 +146,50 @@ function postCardDiv(post=null) {
   if (post !== null) {
     postCard.querySelector('.card-header > div > h5').innerHTML = `<a class="text-secondary text-decoration-none" href="/user/${post.author.user_id}/">${post.author.username}</a>`;
     postCard.querySelector('.card-body > p').innerHTML = post.contents;
-    postCard.querySelector('.card-body').innerHTML += `<small class="text-muted font-italic">${post.timestamp}</small>`;
-    
+    postCard.querySelector('.card-body').innerHTML += `
+    <div class="row justify-content-between align-items-baseline mt-3">
+      <div class="col-auto">
+      <button title="Like" id="like-btn" class="btn btn-sm btn-light py-1 px-2">
+      <i class="bi bi-heart"></i>
+      </button>
+      </div>
+      <div class="col-auto">
+      <small class="text-muted font-italic">${post.timestamp}</small>
+      </div>
+    </div>
+    `;
+    const likeBtn = postCard.querySelector("#like-btn");
+    if (post.is_liked === true) {
+      likeBtn.classList.add('active');
+      likeBtn.querySelector('i').classList.remove('bi-heart');
+      likeBtn.querySelector('i').classList.add('bi-heart-fill');
+      likeBtn.title = "Unlike";
+      likeBtn.addEventListener('click', () => {
+        unlikePost(post.post_id)
+        .then(resPost => {
+          removeAlert();
+          postCard.replaceWith(postCardDiv(resPost));
+        })
+        .catch(rej => makeAlert(rej.error));
+      })
+    } else if (post.is_liked === false) {
+      likeBtn.addEventListener('click', () => {
+        likePost(post.post_id)
+        .then(resPost => {
+          removeAlert();
+          postCard.replaceWith(postCardDiv(resPost));
+        })
+        .catch(rej => makeAlert(rej.error));
+      })
+    } else if (post.is_liked === null) {
+      likeBtn.setAttribute('disabled', 'true');
+    }
+    if (post.likes_count > 0) {
+      let likesCount = document.createElement('span');
+      likesCount.classList.add('ml-1')
+      likesCount.innerHTML = post.likes_count;
+      likeBtn.append(likesCount);
+    }
     if (post.can_edit) {
       postCard.querySelector(".card-header").appendChild(editBtnDiv(postCard));
     }
@@ -268,6 +310,46 @@ function editBtnDiv(postCard) {
       editDiv.querySelector('.post-contents').focus();
     })
     return editDiv
+}
+
+function likePost(post_id) {
+  return new Promise((resolve, reject) => {
+    fetch(`/api/posts/${post_id}/like/`, {
+      method: 'POST',
+      headers: {'X-CSRFToken': csrftoken},
+      mode: 'same-origin',
+    })
+      .then(response => response.json())
+      .then(result => {
+        console.log(result);
+        if (result.error != undefined) {
+          reject(result);
+        } else {
+          resolve(result);
+        }
+      })
+      .catch(err => reject({error: err}));
+  })
+}
+
+function unlikePost(post_id) {
+  return new Promise((resolve, reject) => {
+    fetch(`/api/posts/${post_id}/unlike/`, {
+      method: 'POST',
+      headers: {'X-CSRFToken': csrftoken},
+      mode: 'same-origin',
+    })
+      .then(response => response.json())
+      .then(result => {
+        console.log(result);
+        if (result.error != undefined) {
+          reject(result);
+        } else {
+          resolve(result);
+        }
+      })
+      .catch(err => reject({error: err}));
+  })
 }
 
 function getCookie(name) {

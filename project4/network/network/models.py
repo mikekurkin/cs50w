@@ -46,6 +46,7 @@ class Post(models.Model):
         }
         if requester is not None:
             res["can_edit"] = True if requester == self.author and requester.is_authenticated else False
+            res["is_liked"] = None if not requester.is_authenticated else True if requester in self.liked_by.all() else False
         return res
 
     class Meta:

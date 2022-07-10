@@ -24,3 +24,11 @@
 .post-contents[contentEditable]:focus {
     box-shadow: 0 0 3pt 2pt cornflowerblue;
 }
+
+#like-btn:disabled {
+    pointer-events: none;
+}
+
+#like-btn:hover > i, #like-btn.active > i {
+    color: red;
+}
