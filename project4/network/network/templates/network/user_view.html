@@ -4,9 +4,6 @@
 {% comment %} {% block following-active %}active{% endblock %} {% endcomment %}
 
 {% block scripts %}
-    <script type="text/javascript">
-        const user_id = {{ user_id }};
-    </script>
     <script src="{% static 'network/user_view.js' %}"></script>
 {% endblock %}
 
@@ -16,7 +13,7 @@
         <div>
             <div id="username-heading" class="row align-items-center">
                 <div class="col-auto px-2">
-                    <h1 id="username" class="my-0"></h2>
+                    <h1 id="username" class="my-0" data-userid="{{ user_id }}">{{ username }}</h2>
                 </div>
                 <div id="follow" class="col-auto px-2"></div>
             </div>
@@ -27,7 +24,7 @@
         <div class="col px-1">
             <div id="posts-count" class="card text-center">
                 <div class="card-body p-2">
-                <h3 class="card-title font-weight-bold m-0"></h3>
+                <h3 class="card-title font-weight-bold m-0">{{ posts_count }}</h3>
                 <small class="card-text">posts</small>
                 </div>
             </div>
@@ -35,7 +32,7 @@
         <div class="col px-1">
         <div id="followers" class="card text-center">
             <div class="card-body p-2">
-            <h3 class="card-title font-weight-bold m-0"></h3>
+            <h3 class="card-title font-weight-bold m-0">{{ followers_count }}</h3>
             <small class="card-text">followers</small>
             </div>
         </div>
@@ -43,7 +40,7 @@
         <div class="col px-1">
         <div id="following" class="card text-center">
             <div class="card-body p-2">
-            <h3 class="card-title font-weight-bold m-0"></h3>
+            <h3 class="card-title font-weight-bold m-0">{{ following_count }}</h3>
             <small class="card-text">following</small>
             </div>
         </div>

@@ -134,14 +134,15 @@ function postCardDiv(post = null) {
   postCard.classList.add('card');
   postCard.classList.add('my-3');
   postCard.classList.add('post_card');
-  postCard.innerHTML = `<div class="card-header row content-adjust-center mx-0">
-  <div class="col-auto">
-    <h5 class="text-dark my-0">New Post</h5>
+  postCard.innerHTML = `
+  <div class="card-header row content-adjust-center mx-0">
+    <div class="col-auto">
+      <h5 class="text-dark my-0">New Post</h5>
+    </div>
   </div>
-</div>
-<div class="card-body">
-  <p class="post-contents card-text mt-n1 mx-n1 mb-2 p-1"></p>
-</div>`;
+  <div class="card-body">
+    <p class="post-contents card-text mt-n1 mx-n1 mb-2 p-1"></p>
+  </div>`;
 
   if (post !== null) {
     postCard.querySelector(
@@ -158,8 +159,7 @@ function postCardDiv(post = null) {
       <div class="col-auto">
       <small class="text-muted font-italic">${post.timestamp}</small>
       </div>
-    </div>
-    `;
+    </div>`;
     const likeBtn = postCard.querySelector('#like-btn');
     if (post.is_liked === true) {
       likeBtn.classList.add('active');
@@ -310,6 +310,30 @@ function editBtnDiv(postCard) {
     editDiv.querySelector('.post-contents').focus();
   });
   return editDiv;
+}
+
+
+function followButton(user) {
+  let followBtn = document.createElement('button');
+  followBtn.id = 'follow-btn';
+  followBtn.title = user.is_following ? 'Unfollow' : 'Follow';
+  followBtn.classList.add('btn');
+  followBtn.classList.add('btn-link');
+  followBtn.classList.add('btn-lg');
+  followBtn.classList.add('py-1');
+  followBtn.classList.add('px-0');
+  followBtn.innerHTML = user.is_following ? '<i class="bi bi-star-fill"></i>' : '<i class="bi bi-star"></i>';
+  if (user.is_following) followBtn.classList.add('active');
+  followBtn.addEventListener('click', () => {
+    let followFn = user.is_following ? unfollowUser : followUser;
+    followFn(user.user_id)
+      .then(result => {
+        removeAlert();
+        showUserInfo(result);
+      })
+      .catch(err => makeAlert(err.error));
+  });
+  return followBtn;
 }
 
 function likePost(post_id) {

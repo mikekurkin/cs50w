@@ -2,7 +2,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
 from django.http import HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 
 from .models import User
@@ -18,9 +18,8 @@ def following(request):
 
 
 def user_view(request, user_id):
-    return render(request, "network/user_view.html", {
-        'user_id': user_id
-    })
+    user = get_object_or_404(User, pk=user_id)
+    return render(request, "network/user_view.html", user.serialize(verbose=True))
 
 
 def login_view(request):
