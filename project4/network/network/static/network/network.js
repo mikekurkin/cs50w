@@ -164,13 +164,14 @@ function postCardDiv(post = null) {
       </div>
     `;
     const likeBtn = postCard.querySelector('#like-btn');
+    likeBtn.dataset.postid = post.post_id;
     if (post.is_liked === true) {
       likeBtn.classList.add('active');
       likeBtn.querySelector('i').classList.remove('fa-regular');
       likeBtn.querySelector('i').classList.add('fa-solid');
       likeBtn.title = 'Unlike';
-      likeBtn.addEventListener('click', () => {
-        unlikePost(post.post_id)
+      likeBtn.addEventListener('click', function() {
+        unlikePost(this.dataset.postid)
           .then(resPost => {
             removeAlert();
             postCard.replaceWith(postCardDiv(resPost));
@@ -178,8 +179,8 @@ function postCardDiv(post = null) {
           .catch(rej => makeAlert(rej.error));
       });
     } else if (post.is_liked === false) {
-      likeBtn.addEventListener('click', () => {
-        likePost(post.post_id)
+      likeBtn.addEventListener('click', function() {
+        likePost(this.dataset.postid)
           .then(resPost => {
             removeAlert();
             postCard.replaceWith(postCardDiv(resPost));
@@ -203,45 +204,39 @@ function postCardDiv(post = null) {
   return postCard;
 }
 
-function editFormDiv(postDiv) {
+function makeEditForm(postDiv) {
   const newPost = (postDiv.id == "new-post");
-  let editDiv = postDiv.cloneNode(true);
-  const postContents = editDiv.querySelector('.post-contents');
+  
+  const postContents = postDiv.querySelector('.post-contents');
   let cancelButton = document.createElement('div');
   const contentsBefore = postContents.innerHTML;
   cancelButton.innerHTML = '<button title="Cancel Editing" class="btn btn-link btn-sm text-secondary p-0 m-0"><i class="fa-regular fa-circle-xmark"></i></button>';
-  cancelButton.querySelector('button').addEventListener('click', e => {
-    e.preventDefault();
-    cancelEditing();
-  })
+  cancelButton.querySelector('button').addEventListener('click', cancelEditing)
   let saveButton = document.createElement('div');
   saveButton.classList.add('col-auto');
   saveButton.classList.add('ml-auto');
   saveButton.innerHTML = `<button id="like-btn" class="btn btn-sm btn-primary py-1 px-2">${newPost ? 'Post' : 'Save'}</button>`;
-  saveButton.querySelector('button').addEventListener('click', e => {
-    e.preventDefault();
-    finishEditing();
-  });
+  saveButton.querySelector('button').addEventListener('click', finishEditing);
   postContents.setAttribute('contentEditable', 'plaintext-only');
 
   if (newPost !== true) {
-    const editButton = editDiv.querySelector('.edit-btn');
+    const editButton = postDiv.querySelector('.edit-btn');
     editButton.replaceWith(cancelButton);
   }
 
-  editDiv.querySelector('.card-body > .row').appendChild(saveButton);
+  postDiv.querySelector('.card-body > .row').appendChild(saveButton);
 
-  return editDiv;
+  return postDiv;
 
   function cancelEditing() {
-    editDiv.querySelector('.post-contents').innerHTML = contentsBefore;
+    postDiv.querySelector('.post-contents').innerHTML = contentsBefore;
     postContents.removeAttribute('contentEditable');
-    cancelButton.replaceWith(editBtnDiv(editDiv));
+    cancelButton.replaceWith(editBtnDiv(postDiv));
     saveButton.remove();
   }
 
   function finishEditing() {
-    let contents = editDiv.querySelector('.post-contents').innerHTML;
+    let contents = postDiv.querySelector('.post-contents').innerHTML;
     if (newPost === true) {
       if (contents === '') {
         makeAlert('No contents provided!');
@@ -261,7 +256,7 @@ function editFormDiv(postDiv) {
         saveEditedPost(post_id, contents)
           .then(responsePost => {
             removeAlert();
-            editDiv.replaceWith(postCardDiv(responsePost));
+            postDiv.replaceWith(postCardDiv(responsePost));
           })
           .catch(rej => makeAlert(rej.error));
       }
@@ -323,9 +318,8 @@ function editBtnDiv(postCard) {
   editDiv.innerHTML = '<button title="Edit Post" class="btn btn-link btn-sm text-secondary p-0 m-0"><i class="fa-solid fa-pencil"></i></button>';
   editDiv.querySelector('button').addEventListener('click', e => {
     e.preventDefault();
-    editDiv = editFormDiv(postCard);
-    postCard.replaceWith(editDiv);
-    editDiv.querySelector('.post-contents').focus();
+    makeEditForm(postCard);
+    postCard.querySelector('.post-contents').focus();
   });
   return editDiv;
 }

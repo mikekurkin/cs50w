@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
         flipCaret(caret);
         newPostBtn.classList.remove('active');
       } else {
-        document.querySelector('#posts-wrapper').prepend(editFormDiv(postCardDiv(), (newPost = true)));
+        document.querySelector('#posts-wrapper').prepend(makeEditForm(postCardDiv()));
         document.querySelector('#new-post .post-contents').focus();
         flipCaret(caret);
         newPostBtn.classList.add('active');
