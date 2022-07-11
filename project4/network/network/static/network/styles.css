@@ -44,3 +44,21 @@
 @media only screen {
     .container { max-width: 720px; }
 }
+
+#new-post {
+    animation: fadeIn 0.2s ease-in forwards;
+}
+
+@keyframes fadeIn {
+    0% {
+        transform: translateY(-2px);
+        /* height: 0px !important; */
+        opacity: 0;
+    }
+
+    100% {
+        transform: translateY(0px);
+        /* height: 100%; */
+        opacity: 1;
+    }
+}

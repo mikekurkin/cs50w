@@ -133,33 +133,36 @@ function postCardDiv(post = null) {
   postCard.id = post !== null ? `post${post.post_id}` : 'new-post';
   postCard.classList.add('card');
   postCard.classList.add('my-3');
-  postCard.classList.add('post_card');
+  postCard.classList.add('post-card');
   postCard.innerHTML = `
   <div class="card-header row content-adjust-center mx-0">
-    <div class="col-auto">
+    <div class="col-auto pl-0">
       <h5 class="text-dark my-0">New Post</h5>
+    </div>
+    <div class="col-auto order-last ml-auto pr-0">
+      <small class="text-muted font-italic"></small>
     </div>
   </div>
   <div class="card-body">
     <p class="post-contents card-text mt-n1 mx-n1 mb-2 p-1"></p>
+    <div class="row justify-content-between align-items-baseline mt-3">
+    </div>
   </div>`;
 
   if (post !== null) {
+    postCard.dataset['postid'] = post.post_id;
     postCard.querySelector(
       '.card-header > div > h5'
     ).innerHTML = `<a class="text-secondary text-decoration-none" href="/user/${post.author.user_id}/">${post.author.username}</a>`;
     postCard.querySelector('.card-body > p').innerHTML = post.contents;
-    postCard.querySelector('.card-body').innerHTML += `
-    <div class="row justify-content-between align-items-baseline mt-3">
+    postCard.querySelector('.card-header small').innerHTML = post.timestamp;
+    postCard.querySelector('.card-body > .row').innerHTML = `
       <div class="col-auto">
       <button title="Like" id="like-btn" class="btn btn-sm btn-light py-1 px-2">
       <i class="bi bi-heart"></i>
       </button>
       </div>
-      <div class="col-auto">
-      <small class="text-muted font-italic">${post.timestamp}</small>
-      </div>
-    </div>`;
+    `;
     const likeBtn = postCard.querySelector('#like-btn');
     if (post.is_liked === true) {
       likeBtn.classList.add('active');
@@ -200,26 +203,42 @@ function postCardDiv(post = null) {
   return postCard;
 }
 
-function editFormDiv(postDiv, newPost = true) {
+function editFormDiv(postDiv) {
+  const newPost = (postDiv.id == "new-post");
   let editDiv = postDiv.cloneNode(true);
   const postContents = editDiv.querySelector('.post-contents');
-  let saveButton = document.createElement('div');
+  let cancelButton = document.createElement('div');
   const contentsBefore = postContents.innerHTML;
-  saveButton.innerHTML = '<a href="#" title="Save Post" class="small text-secondary bi bi-check2-square"></a>';
-  saveButton.querySelector('a').addEventListener('click', e => {
+  cancelButton.innerHTML = '<a href="#" title="Cancel Editing" class="small text-secondary bi bi-x-lg"></a>';
+  cancelButton.querySelector('a').addEventListener('click', e => {
+    e.preventDefault();
+    cancelEditing();
+  })
+  let saveButton = document.createElement('div');
+  saveButton.classList.add('col-auto');
+  saveButton.classList.add('ml-auto');
+  saveButton.innerHTML = `<button id="like-btn" class="btn btn-sm btn-primary py-1 px-2">${newPost ? 'Post' : 'Save'}</button>`;
+  saveButton.querySelector('button').addEventListener('click', e => {
     e.preventDefault();
     finishEditing();
   });
   postContents.setAttribute('contentEditable', 'plaintext-only');
 
-  if (newPost === true) {
-    editDiv.querySelector('.card-header').appendChild(saveButton);
-  } else {
+  if (newPost !== true) {
     const editButton = editDiv.querySelector('.edit-btn');
-    editButton.replaceWith(saveButton);
+    editButton.replaceWith(cancelButton);
   }
 
+  editDiv.querySelector('.card-body > .row').appendChild(saveButton);
+
   return editDiv;
+
+  function cancelEditing() {
+    editDiv.querySelector('.post-contents').innerHTML = contentsBefore;
+    postContents.removeAttribute('contentEditable');
+    cancelButton.replaceWith(editBtnDiv(editDiv));
+    saveButton.remove();
+  }
 
   function finishEditing() {
     let contents = editDiv.querySelector('.post-contents').innerHTML;
@@ -230,16 +249,15 @@ function editFormDiv(postDiv, newPost = true) {
         saveNewPost(contents)
           .then(() => {
             removeAlert();
-            showPage(1);
+            goToPage(1);
           })
           .catch(rej => makeAlert(rej.error));
       }
     } else {
-      const post_id = parseInt(editDiv.id.split('post').pop());
       if (contents === contentsBefore) {
-        postContents.removeAttribute('contentEditable');
-        saveButton.replaceWith(editBtnDiv(editDiv));
+        cancelEditing()
       } else {
+        const post_id = parseInt(postDiv.dataset['postid']);
         saveEditedPost(post_id, contents)
           .then(responsePost => {
             removeAlert();
@@ -305,7 +323,7 @@ function editBtnDiv(postCard) {
   editDiv.innerHTML = '<a href="#" title="Edit Post" class="small text-secondary bi bi-pencil"></a>';
   editDiv.querySelector('a').addEventListener('click', e => {
     e.preventDefault();
-    editDiv = editFormDiv(postCard, (newPost = false));
+    editDiv = editFormDiv(postCard);
     postCard.replaceWith(editDiv);
     editDiv.querySelector('.post-contents').focus();
   });
