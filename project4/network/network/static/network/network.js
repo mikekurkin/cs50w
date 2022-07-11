@@ -159,15 +159,15 @@ function postCardDiv(post = null) {
     postCard.querySelector('.card-body > .row').innerHTML = `
       <div class="col-auto">
       <button title="Like" id="like-btn" class="btn btn-sm btn-light py-1 px-2">
-      <i class="bi bi-heart"></i>
+      <i class="fa-regular fa-heart"></i>
       </button>
       </div>
     `;
     const likeBtn = postCard.querySelector('#like-btn');
     if (post.is_liked === true) {
       likeBtn.classList.add('active');
-      likeBtn.querySelector('i').classList.remove('bi-heart');
-      likeBtn.querySelector('i').classList.add('bi-heart-fill');
+      likeBtn.querySelector('i').classList.remove('fa-regular');
+      likeBtn.querySelector('i').classList.add('fa-solid');
       likeBtn.title = 'Unlike';
       likeBtn.addEventListener('click', () => {
         unlikePost(post.post_id)
@@ -209,8 +209,8 @@ function editFormDiv(postDiv) {
   const postContents = editDiv.querySelector('.post-contents');
   let cancelButton = document.createElement('div');
   const contentsBefore = postContents.innerHTML;
-  cancelButton.innerHTML = '<a href="#" title="Cancel Editing" class="small text-secondary bi bi-x-lg"></a>';
-  cancelButton.querySelector('a').addEventListener('click', e => {
+  cancelButton.innerHTML = '<button title="Cancel Editing" class="btn btn-link btn-sm text-secondary p-0 m-0"><i class="fa-regular fa-circle-xmark"></i></button>';
+  cancelButton.querySelector('button').addEventListener('click', e => {
     e.preventDefault();
     cancelEditing();
   })
@@ -320,8 +320,8 @@ function editBtnDiv(postCard) {
   editDiv.classList.add('col-auto');
   editDiv.classList.add('edit-btn');
   editDiv.classList.add('px-0');
-  editDiv.innerHTML = '<a href="#" title="Edit Post" class="small text-secondary bi bi-pencil"></a>';
-  editDiv.querySelector('a').addEventListener('click', e => {
+  editDiv.innerHTML = '<button title="Edit Post" class="btn btn-link btn-sm text-secondary p-0 m-0"><i class="fa-solid fa-pencil"></i></button>';
+  editDiv.querySelector('button').addEventListener('click', e => {
     e.preventDefault();
     editDiv = editFormDiv(postCard);
     postCard.replaceWith(editDiv);
@@ -340,7 +340,7 @@ function followButton(user) {
   followBtn.classList.add('btn-lg');
   followBtn.classList.add('py-1');
   followBtn.classList.add('px-0');
-  followBtn.innerHTML = user.is_following ? '<i class="bi bi-star-fill"></i>' : '<i class="bi bi-star"></i>';
+  followBtn.innerHTML = `<i class="${user.is_following ? 'fa-solid' : 'fa-regular'} fa-star"></i>`;
   if (user.is_following) followBtn.classList.add('active');
   followBtn.addEventListener('click', () => {
     let followFn = user.is_following ? unfollowUser : followUser;

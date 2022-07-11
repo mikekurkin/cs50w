@@ -1,5 +1,3 @@
-@import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.3/font/bootstrap-icons.css");
-
 .pagination .page-link {
     color: dimgrey;
 }
@@ -41,6 +39,9 @@
     color: gold !important;
 }
 
+.edit-btn {
+    opacity: 50%;
+}
 @media only screen {
     .container { max-width: 720px; }
 }

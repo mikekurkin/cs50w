@@ -24,12 +24,12 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
   function flipCaret(caret) {
-    if ([...caret.classList].includes('bi-caret-down')) {
-      caret.classList.remove('bi-caret-down');
-      caret.classList.add('bi-caret-up-fill');
+    if ([...caret.classList].includes('fa-angle-down')) {
+      caret.classList.remove('fa-angle-down');
+      caret.classList.add('fa-angle-up');
     } else {
-      caret.classList.remove('bi-caret-up-fill');
-      caret.classList.add('bi-caret-down');
+      caret.classList.remove('fa-angle-up');
+      caret.classList.add('fa-angle-down');
     }
   }
 });
