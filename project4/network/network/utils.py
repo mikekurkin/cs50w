@@ -1,15 +1,17 @@
 from django.core import paginator
 from django.http import JsonResponse
 
-PER_PAGE = 10
+from humanize import naturaldate, naturaltime
+from datetime import datetime, timedelta, timezone
 
 
-def get_posts_page(posts, page):
+
+def get_posts_page(posts, page, requester=None):
     p = paginator.Paginator(posts, PER_PAGE)
     try:
         return {
             "pages": p.num_pages,
-            "posts": [post.serialize() for post in p.page(page).object_list],
+            "posts": [post.serialize(requester=requester) for post in p.page(page).object_list],
         }
     except paginator.EmptyPage as e:
         return {
@@ -41,3 +43,10 @@ def api_method_required(method):
             return func(request, *args, **kwargs)
         return wrapper
     return decorator
+
+
+def humanize_timestamp(timestamp: datetime) -> str:
+    if datetime.now().date() < timestamp.date() + timedelta(days=3):
+        return naturaltime(timestamp, when=datetime.now(timezone.utc))
+    else:
+        return naturaldate(timestamp)

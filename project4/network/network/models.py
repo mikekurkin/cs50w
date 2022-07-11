@@ -1,6 +1,8 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
+from .utils import humanize_timestamp
+
 
 class User(AbstractUser):
     followers = models.ManyToManyField(
@@ -16,8 +18,7 @@ class User(AbstractUser):
         }
         if verbose:
             res.update({
-                "date_joined": self.date_joined.strftime("%b %d %Y, %I:%M %p"),
-                "last_login": self.last_login.strftime("%b %d %Y, %I:%M %p"),
+                "last_login": humanize_timestamp(self.last_login),
                 "posts_count": self.posts.count(),
                 "followers_count": self.followers.count(),
                 "following_count": self.following.count(),
@@ -46,8 +47,8 @@ class Post(models.Model):
             "post_id": self.pk,
             "author": self.author.serialize(),
             "contents": self.contents,
-            "timestamp": self.timestamp.strftime("%b %d %Y, %I:%M %p"),
-            "likes_count": self.likes.count(),
+            "timestamp": humanize_timestamp(self.timestamp),
+            "likes_count": self.liked_by.distinct().count(),
         }
         if requester is not None:
             res["can_edit"] = \
