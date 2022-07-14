@@ -19,7 +19,7 @@ def following(request):
 
 def user_view(request, user_id):
     user = get_object_or_404(User, pk=user_id)
-    return render(request, "network/user_view.html", user.serialize(verbose=True))
+    return render(request, "network/user_view.html", user.serialize(verbose=True, requester=request.user))
 
 
 def login_view(request):

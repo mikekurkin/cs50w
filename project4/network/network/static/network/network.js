@@ -6,7 +6,7 @@ var apiRoute = '';
 
 function getPageNumber() {
   const urlParams = new URLSearchParams(window.location.search);
-  var p = 1;
+  let p = 1;
   if (urlParams.has('p')) {
     p = parseInt(urlParams.get('p'));
   }
@@ -129,75 +129,58 @@ function makePaginator(total, current) {
 }
 
 function postCardDiv(post = null) {
-  let postCard = document.createElement('div');
+  const postTemplate = document.querySelector('#post-template');
+  const postCard = postTemplate.content.firstElementChild.cloneNode(true);
+  
   postCard.id = post !== null ? `post${post.post_id}` : 'new-post';
-  postCard.classList.add('card');
-  postCard.classList.add('my-3');
-  postCard.classList.add('post-card');
-  postCard.innerHTML = `
-  <div class="card-header row content-adjust-center mx-0">
-    <div class="col-auto pl-0">
-      <h5 class="text-dark my-0">New Post</h5>
-    </div>
-    <div class="col-auto order-last ml-auto pr-0">
-      <small class="text-muted font-italic"></small>
-    </div>
-  </div>
-  <div class="card-body">
-    <p class="post-contents card-text mt-n1 mx-n1 mb-2 p-1"></p>
-    <div class="row justify-content-between align-items-baseline mt-3">
-    </div>
-  </div>`;
 
-  if (post !== null) {
+  if (post === null) {
+    postCard.querySelector('.card-title')
+      .innerHTML = "New Post";
+    postCard.querySelector('.post-timestamp')
+      .innerHTML = "now";
+  } else {
     postCard.dataset['postid'] = post.post_id;
-    postCard.querySelector(
-      '.card-header > div > h5'
-    ).innerHTML = `<a class="text-secondary text-decoration-none" href="/user/${post.author.user_id}/">${post.author.username}</a>`;
-    postCard.querySelector('.card-body > p').innerHTML = post.contents;
-    postCard.querySelector('.card-header small').innerHTML = post.timestamp;
-    postCard.querySelector('.card-body > .row').innerHTML = `
-      <div class="col-auto">
-      <button title="Like" id="like-btn" class="btn btn-sm btn-light py-1 px-2">
-      <i class="fa-regular fa-heart"></i>
-      </button>
-      </div>
-    `;
-    const likeBtn = postCard.querySelector('#like-btn');
+    postCard.querySelector('.author-link')
+      .innerHTML = post.author.username;
+    postCard.querySelector('.author-link')
+      .setAttribute('href', `/user/${post.author.user_id}/`);
+    postCard.querySelector('.post-contents')
+      .innerHTML = post.contents;
+    postCard.querySelector('.post-timestamp')
+      .innerHTML = post.timestamp;
+
+    const likeBtn = postCard.querySelector('.like-btn');
     likeBtn.dataset.postid = post.post_id;
-    if (post.is_liked === true) {
-      likeBtn.classList.add('active');
-      likeBtn.querySelector('i').classList.remove('fa-regular');
-      likeBtn.querySelector('i').classList.add('fa-solid');
-      likeBtn.title = 'Unlike';
-      likeBtn.addEventListener('click', function() {
-        unlikePost(this.dataset.postid)
-          .then(resPost => {
-            removeAlert();
-            postCard.replaceWith(postCardDiv(resPost));
-          })
-          .catch(rej => makeAlert(rej.error));
-      });
-    } else if (post.is_liked === false) {
-      likeBtn.addEventListener('click', function() {
-        likePost(this.dataset.postid)
-          .then(resPost => {
-            removeAlert();
-            postCard.replaceWith(postCardDiv(resPost));
-          })
-          .catch(rej => makeAlert(rej.error));
-      });
-    } else if (post.is_liked === null) {
-      likeBtn.setAttribute('disabled', 'true');
+    if (post.is_liked === null) {
+        likeBtn.setAttribute('disabled', 'true');
+    } else {
+      likeBtn.title = (post.is_liked === true) ? 'Unlike' : 'Like';
+      const likeFn = (post.is_liked === true) ? unlikePost : likePost;
+      likeBtn.classList.toggle('active', post.is_liked === true);
+      likeBtn.onclick = function () {
+        likeFn(this.dataset.postid)
+        .then(resPost => {
+          removeAlert();
+          postCard.replaceWith(postCardDiv(resPost));
+        })
+        .catch(err => makeAlert(err.error));
+      }
     }
-    if (post.likes_count > 0) {
-      let likesCount = document.createElement('span');
-      likesCount.classList.add('ml-1');
-      likesCount.innerHTML = post.likes_count;
-      likeBtn.append(likesCount);
-    }
+
+    postCard.querySelector('.likes-count')
+      .innerHTML = post.likes_count;
+    postCard.querySelector('.likes-count')
+      .toggleAttribute('hidden', post.likes_count === 0);
+    
+    postCard.querySelector('.edit-wrapper')
+      .toggleAttribute('hidden', !post.can_edit);
+    
     if (post.can_edit) {
-      postCard.querySelector('.card-header').appendChild(editBtnDiv(postCard));
+      postCard.querySelector('.edit-btn')
+        .onclick = () => {
+        makeEditForm(postCard);
+      }
     }
   }
 
@@ -205,34 +188,38 @@ function postCardDiv(post = null) {
 }
 
 function makeEditForm(postDiv) {
-  const newPost = (postDiv.id == "new-post");
+  const newPost = (postDiv.id === 'new-post');
   
   const postContents = postDiv.querySelector('.post-contents');
-  let cancelButton = document.createElement('div');
   const contentsBefore = postContents.innerHTML;
-  cancelButton.innerHTML = '<button title="Cancel Editing" class="btn btn-link btn-sm text-secondary p-0 m-0"><i class="fa-regular fa-circle-xmark"></i></button>';
-  cancelButton.querySelector('button').addEventListener('click', cancelEditing)
-  let saveButton = document.createElement('div');
-  saveButton.classList.add('col-auto');
-  saveButton.classList.add('ml-auto');
-  saveButton.innerHTML = `<button id="like-btn" class="btn btn-sm btn-primary py-1 px-2">${newPost ? 'Post' : 'Save'}</button>`;
-  saveButton.querySelector('button').addEventListener('click', finishEditing);
+
+  const cancelButton = postDiv.querySelector('.cancel-btn');
+  const editButton = postDiv.querySelector('.edit-btn');
+  const saveButton = postDiv.querySelector('.save-btn');
+
+  cancelButton.onclick = cancelEditing;
+ 
+  saveButton.innerHTML = newPost ? 'Post' : 'Save';
+  saveButton.onclick = finishEditing;
   postContents.setAttribute('contentEditable', 'plaintext-only');
 
   if (newPost !== true) {
-    const editButton = postDiv.querySelector('.edit-btn');
-    editButton.replaceWith(cancelButton);
+    editButton.setAttribute('hidden', '');
+    cancelButton.removeAttribute('hidden');
   }
-
-  postDiv.querySelector('.card-body > .row').appendChild(saveButton);
+  saveButton.removeAttribute('hidden');
+  
+  postDiv.querySelector('.post-contents').focus();
 
   return postDiv;
 
   function cancelEditing() {
     postDiv.querySelector('.post-contents').innerHTML = contentsBefore;
     postContents.removeAttribute('contentEditable');
-    cancelButton.replaceWith(editBtnDiv(postDiv));
-    saveButton.remove();
+    cancelButton.setAttribute('hidden', '');
+    editButton.removeAttribute('hidden');
+    saveButton.setAttribute('hidden', '');
+    saveButton.onclick = null;
   }
 
   function finishEditing() {
@@ -246,7 +233,7 @@ function makeEditForm(postDiv) {
             removeAlert();
             goToPage(1);
           })
-          .catch(rej => makeAlert(rej.error));
+          .catch(err => makeAlert(err.error));
       }
     } else {
       if (contents === contentsBefore) {
@@ -258,7 +245,7 @@ function makeEditForm(postDiv) {
             removeAlert();
             postDiv.replaceWith(postCardDiv(responsePost));
           })
-          .catch(rej => makeAlert(rej.error));
+          .catch(err => makeAlert(err.error));
       }
     }
   }
@@ -310,43 +297,6 @@ function saveEditedPost(post_id, contents) {
   });
 }
 
-function editBtnDiv(postCard) {
-  let editDiv = document.createElement('div');
-  editDiv.classList.add('col-auto');
-  editDiv.classList.add('edit-btn');
-  editDiv.classList.add('px-0');
-  editDiv.innerHTML = '<button title="Edit Post" class="btn btn-link btn-sm text-secondary p-0 m-0"><i class="fa-solid fa-pencil"></i></button>';
-  editDiv.querySelector('button').addEventListener('click', e => {
-    e.preventDefault();
-    makeEditForm(postCard);
-    postCard.querySelector('.post-contents').focus();
-  });
-  return editDiv;
-}
-
-
-function followButton(user) {
-  let followBtn = document.createElement('button');
-  followBtn.id = 'follow-btn';
-  followBtn.title = user.is_following ? 'Unfollow' : 'Follow';
-  followBtn.classList.add('btn');
-  followBtn.classList.add('btn-link');
-  followBtn.classList.add('btn-lg');
-  followBtn.classList.add('py-1');
-  followBtn.classList.add('px-0');
-  followBtn.innerHTML = `<i class="${user.is_following ? 'fa-solid' : 'fa-regular'} fa-star"></i>`;
-  if (user.is_following) followBtn.classList.add('active');
-  followBtn.addEventListener('click', () => {
-    let followFn = user.is_following ? unfollowUser : followUser;
-    followFn(user.user_id)
-      .then(result => {
-        removeAlert();
-        showUserInfo(result);
-      })
-      .catch(err => makeAlert(err.error));
-  });
-  return followBtn;
-}
 
 function likePost(post_id) {
   return new Promise((resolve, reject) => {

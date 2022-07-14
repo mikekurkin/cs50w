@@ -4,49 +4,50 @@
 {% comment %} {% block following-active %}active{% endblock %} {% endcomment %}
 
 {% block scripts %}
-    <script src="{% static 'network/user_view.js' %}"></script>
+  <script src="{% static 'network/user_view.js' %}"></script>
+  {% include "network/post_template.html" %}
 {% endblock %}
 
 {% block body %}
-    <div class="row align-items-center justify-content-center mx-sm-3 my-4">
-        <div class="col-sm px-4 px-sm-1 py-3 py-sm-2">
-        <div>
-            <div id="username-heading" class="row align-items-center">
-                <div class="col-auto px-2">
-                    <h1 id="username" class="my-0" data-userid="{{ user_id }}">{{ username }}</h2>
-                </div>
-                <div id="follow" class="col-auto px-2"></div>
-            </div>
-            <small class="text-muted font-italic">Last logged in <span id="last_seen">{{ last_login }}</span></small>
+  <div id="user-header" class="row">
+    <div class="col">
+      <div>
+        <div id="username-heading" class="row">
+          <div class="col">
+            <h1 id="username" data-userid="{{ user_id }}">{{ username }}</h1>
+          </div>
+          <div id="follow" class="col">
+            {% if user.is_authenticated %}
+            {% comment %} {% if user.is_authenticated and user.id != user_id %} {% endcomment %}
+            <button class="follow-btn{% if is_following %} active{% endif %}"></button>
+            {% endif %}
+          </div>
         </div>
-        </div>
-        <div class="row col-sm-6  flex-shrink-0">
-        <div class="col px-1">
-            <div id="posts-count" class="card text-center">
-                <div class="card-body p-2">
-                <h3 class="card-title font-weight-bold m-0">{{ posts_count }}</h3>
-                <small class="card-text">posts</small>
-                </div>
-            </div>
-        </div>
-        <div class="col px-1">
-        <div id="followers" class="card text-center">
-            <div class="card-body p-2">
-            <h3 class="card-title font-weight-bold m-0">{{ followers_count }}</h3>
-            <small class="card-text">followers</small>
-            </div>
-        </div>
-        </div>
-        <div class="col px-1">
-        <div id="following" class="card text-center">
-            <div class="card-body p-2">
-            <h3 class="card-title font-weight-bold m-0">{{ following_count }}</h3>
-            <small class="card-text">following</small>
-            </div>
-        </div>
-        </div>
-        </div>
+        <small class="text-muted font-italic">Last logged in <span id="last-seen">{{ last_login }}</span></small>
+      </div>
     </div>
-    <div id="posts" class=""></div>
-    <div id="pages"></div>
+    <div class="col">
+      <div id="posts-count" class="card">
+        <div class="card-body">
+          <h3 class="card-title">{{ posts_count }}</h3>
+          <small class="card-text">posts</small>
+        </div>
+      </div>
+      <div id="followers-count" class="card">
+        <div class="card-body">
+          <h3 class="card-title">{{ followers_count }}</h3>
+          <small class="card-text">followers</small>
+        </div>
+      </div>
+      <div id="following-count" class="card">
+        <div class="card-body">
+          <h3 class="card-title">{{ following_count }}</h3>
+          <small class="card-text">following</small>
+        </div>
+      </div>
+    
+    </div>
+  </div>
+  <div id="posts" class=""></div>
+  <div id="pages"></div>
 {% endblock %}

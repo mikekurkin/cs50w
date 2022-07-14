@@ -1,0 +1,4 @@
+[submodule "project4/network/bootstrap"]
+	path = project4/network/bootstrap
+	url = git@github.com:twbs/bootstrap.git
+	branch = v4-sass-deps

@@ -4,25 +4,24 @@
 {% block index-active %}active{% endblock %}
 
 {% block scripts %}
-    <script src="{% static 'network/index.js' %}"></script>
+  <script src="{% static 'network/index.js' %}"></script>
+  {% include "network/post_template.html" %}
 {% endblock %}
 
 {% block body %}
-    <div id="posts">
-    <div class="row align-items-baseline justify-content-between mx-sm-4 my-4">
-        <div class="col-auto px-0"><h2 id="heading">All Posts</h2></div>
-        {% if user.is_authenticated %}
-        <div class="col-auto px-0">
-            <button id="new-btn" class="btn btn-outline-secondary px-1" title="New Post">
-                <span class="h5">
-                    <i class="fa-regular fa-pen-to-square mx-1"></i>
-                    New
-                    <i class="fa-regular fa-angle-down mx-1"></i>
-                </span>
-            </button>
+  <div id="posts">
+    <div id="posts-header" class="row">
+      <div class="col"><h2 id="heading">All Posts</h2></div>
+      {% if user.is_authenticated %}
+        <div class="col">
+          <button id="new-btn" title="New Post">
+            <span>New</span>
+          </button>
         </div>
-        {% endif %}
+      {% endif %}
     </div>
+    <div id="posts-wrapper">
     </div>
-    <div id="pages"></div>
+  </div>
+  <div id="pages"></div>
 {% endblock %}

@@ -1,0 +1,27 @@
+<template id="post-template">
+    <div class="post-card" data-postid>
+      <div class="card-header row">
+        <div class="col">
+          <h5 class="card-title text-dark my-0"><a class="author-link text-secondary text-decoration-none" href="#"></a></h5>
+        </div>
+        <div class="col edit-wrapper" hidden>
+          <button title="Edit Post" class="edit-btn btn"></button>
+          <button title="Cancel Editing" class="cancel-btn btn" hidden></button>
+        </div>
+        <div class="col">
+          <small class="post-timestamp"></small>
+        </div>
+      </div>
+      <div class="card-body">
+        <p class="post-contents"></p>
+        <div class="post-footer row">
+          <div class="col-auto">
+          <button title="Like" class="like-btn btn"><span class="likes-count"></span></button>
+        </div>
+        <div class="col-auto ml-auto">
+          <button class="save-btn btn" hidden>Save</button>
+        </div>
+        </div>
+      </div>
+    </div>
+  </template>

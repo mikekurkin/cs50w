@@ -1,0 +1,184 @@
+@import '../../../bootstrap/scss/bootstrap';
+@import url('//cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css');
+
+@media only screen {
+    .container {
+        max-width: 720px;
+    }
+}
+
+@mixin far($content) {
+    display: inline-block;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    font: var(--fa-font-regular);
+    content: $content;
+}
+
+@mixin fas($content) {
+    display: inline-block;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    font: var(--fa-font-solid);
+    content: $content;
+}
+
+#posts-header {
+    @extend .align-items-baseline, .justify-content-between, .mx-sm-4, .my-4;
+    
+    .col {
+        @extend .col-auto, .px-0;
+    }
+}
+
+#user-header {
+    @extend .align-items-baseline, .justify-content-between, .mx-sm-4, .my-4;
+    
+    &> .col {
+        &:not(:last-child) {@extend .col-sm, .px-4, .px-sm-1, .py-3, .py-sm-2;}
+        &:last-child {@extend .col-sm-6, .row;}
+    }
+    
+    .card {
+        @extend .col, .px-1, .mx-1, .text-center;
+        .card-body {
+            @extend .p-2;
+            .card-title {@extend .font-weight-bold, .m-0;}
+        }
+    }
+    
+    #username-heading {
+        @extend .align-items-center;
+        .col {@extend .col-auto, .px-2;}
+        #username {@extend .my-0;}
+    }
+}
+
+
+.post-card {
+    @extend .card, .my-3;
+
+    .card-header {
+        @extend .align-items-center, .mx-0;
+
+        .col {
+            @extend .col-auto, .px-0;
+            &:last-child {@extend .ml-auto;}
+        }
+
+        .btn {
+            @extend .btn-link, .btn-sm, .text-secondary, .py-0, .px-2, .m-0;
+            opacity: 60%;
+            &:hover {
+                opacity: 75%;
+            }
+        }
+
+        .edit-btn::before {@include fas("\f303");}
+
+        .cancel-btn::before {@include fas("\f057");}
+    }
+
+    .post-timestamp {
+        @extend .text-muted, .font-italic;
+    }
+
+    .card-body {
+        .post-contents {
+            @extend .card-text, .mt-n1, .mx-n1, .mb-2, .p-1;
+
+            white-space: pre-wrap;
+    
+            &[contentEditable] {
+                outline: none;
+                border: none;
+                box-shadow: 0 0 0 0.5pt grey;
+                border-radius: 2pt;
+                
+                &:focus {
+                    box-shadow: 0 0 3pt 2pt cornflowerblue;
+                }
+            }
+        }
+        .post-footer {
+            @extend .justify-content-between, .align-items-baseline, .mt-3;
+
+            .btn {@extend .btn-sm, .py-1, .px-2;}
+
+            .save-btn {@extend .btn-primary;}
+
+            .like-btn {
+                @extend .btn-light;
+
+                &::before {@include far("\f004");}
+                &.active::before {@include fas("\f004");}
+
+                &:hover::before, 
+                &.active::before {
+                    color: red;
+                }}
+                &:disabled {pointer-events: none;}
+                
+                span {@extend .ml-1;}
+        }
+    }
+}
+
+
+.follow-btn {
+    @extend .btn, .btn-link, .text-decoration-none, .btn-lg, .py-1, .px-0;
+    &::before {@include far("\f005");}
+    &.active::before {@include fas("\f005");}
+    
+    color: grey !important;
+    &:hover,
+    &.active {
+        color: gold !important;
+    }
+}
+
+
+#new-post {
+    animation: fadeIn 0.2s ease-in forwards;
+}
+
+@keyframes fadeIn {
+    0% {
+        transform: translateY(-2px);
+        opacity: 0;
+    }
+    
+    100% {
+        transform: translateY(0px);
+        opacity: 1;
+    }
+}
+
+#new-btn {
+    @extend .px-1, .btn, .btn-outline-secondary;
+    
+    span {
+        @extend .h5;
+        
+        &::before,
+        &::after {
+            @extend .mx-1;  
+        }
+        
+        &::before {@include far('\f044');}
+        &::after {@include far('\f107');}
+    }
+    
+    &.active span::after  {@include far('\f106');}
+}
+
+
+.pagination {
+    .page-link {color: dimgrey;}
+    .disabled .page-link {color: #ccc;}
+    .active .page-link {
+        border-color: grey;
+        background: #aaa;
+    }
+}
+
