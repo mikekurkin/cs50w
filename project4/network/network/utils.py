@@ -45,6 +45,19 @@ def api_method_required(method):
     return decorator
 
 
+def api_methods_allowed(methods):
+    def decorator(func):
+        def wrapper(request, *args, **kwargs):
+            if request.method not in methods:
+                return JsonResponse({
+                    "error": f"Only {', '.join(methods)} requests allowed."
+                }, status=400)
+
+            return func(request, *args, **kwargs)
+        return wrapper
+    return decorator
+
+
 def humanize_timestamp(timestamp: datetime) -> str:
     if datetime.now().date() < timestamp.date() + timedelta(days=3):
         return naturaltime(timestamp, when=datetime.now(timezone.utc))

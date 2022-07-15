@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
-  p = getPageNumber();
-  apiRoute = '';
+  let p = getPageNumber();
+  apiPostsFilter = {};
   showPage(p);
 
   newPostBtn = document.querySelector('#new-btn');

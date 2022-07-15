@@ -2,98 +2,47 @@ import json
 
 from django.http import JsonResponse
 
-from .utils import api_login_required, api_method_required, get_posts_page
+from .utils import api_login_required, api_method_required, api_methods_allowed, get_posts_page
 from .models import User, Post
 
 
-@api_method_required("GET")
-def api_posts_page(request, n=1):
-    page = get_posts_page(Post.objects.all(), n, requester=request.user)
-    return JsonResponse(page, status=(404 if page.get('error') else 200))
+@api_methods_allowed(["GET", "POST"])
+def api_posts(request):
+    match request.method:
+        case "GET": return api_posts_read(request)
+        case "POST": return api_post_create(request)
 
 
 @api_method_required("GET")
-@api_login_required
-def api_following_posts_page(request, n=1):
-    page = get_posts_page(Post.objects.filter(author__in=request.user.following.all()), n,  requester=request.user)
+def api_posts_read(request):
+    page_n = request.GET.get('p', 1)
+    author_id = request.GET.get('author_id')
+    feed_only = request.GET.get('feed_only')
 
-    return JsonResponse(page, status=(404 if page.get('error') else 200))
+    if author_id is not None:
+        page = get_posts_page(Post.objects.filter(author__id=author_id),
+                              page_n, requester=request.user)
 
-
-@api_method_required("GET")
-def api_user(request, user_id):
-    try:
-        user = User.objects.get(pk=user_id)
-    except User.DoesNotExist as e:
-        return JsonResponse({
-            "error": str(e)
-        }, status=404)
-
-    user_info = user.serialize(verbose=True, requester=request.user)
-
-    return JsonResponse(user_info)
-
-
-@api_method_required("GET")
-def api_user_posts_page(request, user_id, n):
-    page = get_posts_page(Post.objects.filter(author__pk=user_id), n, requester=request.user)
+    elif feed_only is not None and feed_only.lower() not in ['false', 'no', '0']:
+        if not request.user.is_authenticated:
+            return JsonResponse({"error": "Must be authenticated."}, status=403)
+        page = get_posts_page(Post.objects.filter(author__in=request.user.following.all()),
+                              page_n, requester=request.user)
+                              
+    else:
+        page = get_posts_page(Post.objects.all(),
+                              page_n, requester=request.user)
 
     return JsonResponse(page, status=(404 if page.get('error') else 200))
-
-
-@api_method_required("GET")
-def api_post_get(request, post_id):
-    try:
-        post = Post.objects.get(pk=post_id)
-    except Post.DoesNotExist as e:
-        return JsonResponse({
-            "error": str(e)
-        }, status=404)
-
-    post_info = post.serialize(requester=request.user)
-
-    return JsonResponse(post_info)
-
-
-@api_method_required("PUT")
-@api_login_required
-def api_post_edit(request, post_id):
-    try:
-        post = Post.objects.get(pk=post_id)
-    except Post.DoesNotExist as e:
-        return JsonResponse({
-            "error": str(e)
-        }, status=404)
-
-    if request.user != post.author:
-        return JsonResponse({
-            "error": "You are not the author."
-        }, status=403)
-
-    contents = json.loads(request.body).get("contents")
-
-    if contents is None:
-        return JsonResponse({
-            "error": "No contents provided."
-        }, status=400)
-
-    post.contents = contents
-    post.save()
-
-    post_info = post.serialize(requester=request.user)
-
-    return JsonResponse(post_info)
 
 
 @api_method_required("POST")
 @api_login_required
-def api_post_new(request):
+def api_post_create(request):
     contents = json.loads(request.body).get("contents")
 
     if contents is None:
-        return JsonResponse({
-            "error": "No contents provided."
-        }, status=400)
+        return JsonResponse({"error": "No contents provided."}, status=400)
 
     post = Post(author=request.user, contents=contents)
     post.save()
@@ -103,71 +52,92 @@ def api_post_new(request):
     return JsonResponse(post_info)
 
 
-@api_method_required("POST")
-@api_login_required
-def api_post_like(request, post_id):
+@api_method_required("GET")
+def api_user_read(request, user_id):
     try:
-        post = Post.objects.get(pk=post_id)
-    except Post.DoesNotExist as e:
-        return JsonResponse({
-            "error": str(e)
-        }, status=404)
-
-    post.liked_by.add(request.user)
-    post.save()
-
-    post_info = post.serialize(requester=request.user)
-
-    return JsonResponse(post_info)
-
-
-@api_method_required("POST")
-@api_login_required
-def api_post_unlike(request, post_id):
-    try:
-        post = Post.objects.get(pk=post_id)
-    except Post.DoesNotExist as e:
-        return JsonResponse({
-            "error": str(e)
-        }, status=404)
-
-    post.liked_by.remove(request.user)
-    post.save()
-
-    post_info = post.serialize(requester=request.user)
-
-    return JsonResponse(post_info)
-
-
-@api_method_required("POST")
-@api_login_required
-def api_user_follow(request, user_id):
-    try:
-        user = User.objects.get(pk=user_id)
+        user = User.objects.get(id=user_id)
     except User.DoesNotExist as e:
-        return JsonResponse({
-            "error": str(e)
-        }, status=404)
-
-    user.followers.add(request.user)
-    user.save()
+        return JsonResponse({"error": str(e)}, status=404)
 
     user_info = user.serialize(verbose=True, requester=request.user)
 
     return JsonResponse(user_info)
 
 
-@api_method_required("POST")
-@api_login_required
-def api_user_unfollow(request, user_id):
-    try:
-        user = User.objects.get(pk=user_id)
-    except User.DoesNotExist as e:
-        return JsonResponse({
-            "error": str(e)
-        }, status=404)
+@api_methods_allowed(["GET", "PUT"])
+def api_post(request, post_id):
+    match request.method:
+        case "GET": return api_post_read(request, post_id)
+        case "PUT": return api_post_update(request, post_id)
 
-    user.followers.remove(request.user)
+
+@api_method_required("GET")
+def api_post_read(request, post_id):
+    try:
+        post = Post.objects.get(id=post_id)
+    except Post.DoesNotExist as e:
+        return JsonResponse({"error": str(e)}, status=404)
+
+    post_info = post.serialize(requester=request.user)
+
+    return JsonResponse(post_info)
+
+
+@api_method_required("PUT")
+@api_login_required
+def api_post_update(request, post_id):
+    try:
+        post = Post.objects.get(id=post_id)
+    except Post.DoesNotExist as e:
+        return JsonResponse({"error": str(e)}, status=404)
+
+    if request.user != post.author:
+        return JsonResponse({"error": "You are not the author."}, status=403)
+
+    contents = json.loads(request.body).get("contents")
+
+    if contents is None:
+        return JsonResponse({"error": "No contents provided."}, status=400)
+
+    post.contents = contents
+    post.save()
+
+    post_info = post.serialize(requester=request.user)
+
+    return JsonResponse(post_info)
+
+
+@api_methods_allowed(["POST", "DELETE"])
+@api_login_required
+def api_like(request, post_id):
+    try:
+        post = Post.objects.get(id=post_id)
+    except Post.DoesNotExist as e:
+        return JsonResponse({"error": str(e)}, status=404)
+
+    match request.method:
+        case "POST": post.liked_by.add(request.user)
+        case "DELETE": post.liked_by.remove(request.user)
+
+    post.save()
+
+    post_info = post.serialize(requester=request.user)
+
+    return JsonResponse(post_info)
+
+
+@api_methods_allowed(["POST", "DELETE"])
+@api_login_required
+def api_follow(request, user_id):
+    try:
+        user = User.objects.get(id=user_id)
+    except User.DoesNotExist as e:
+        return JsonResponse({"error": str(e)}, status=404)
+
+    match request.method:
+        case "POST": user.followers.add(request.user)
+        case "DELETE": user.followers.remove(request.user)
+
     user.save()
 
     user_info = user.serialize(verbose=True, requester=request.user)

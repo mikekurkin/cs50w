@@ -2,7 +2,7 @@ window.addEventListener('popstate', e => showPage(e.state.p));
 
 const csrftoken = getCookie('csrftoken');
 
-var apiRoute = '';
+var apiPostsFilter = {};
 
 function getPageNumber() {
   const urlParams = new URLSearchParams(window.location.search);
@@ -19,7 +19,15 @@ function goToPage(p) {
 }
 
 function showPage(p) {
-  fetch(`/api/posts/${apiRoute}p/${p}/`)
+  let params = new URLSearchParams();
+  for (let param in apiPostsFilter) {
+    params.append(param, apiPostsFilter[param]);
+  }
+  params.append('p', p);
+  let apiAddress = '/api/posts';
+  if (params.toString() !== '') apiAddress += `?${params.toString()}`;
+
+  fetch(apiAddress)
     .then(response => response.json())
     .then(result => {
       if (result.error != undefined) {
@@ -139,17 +147,16 @@ function postCardDiv(post = null) {
     likeBtn.toggleAttribute('disabled', post.is_liked === null);
 
     if (post.is_liked !== null) {
-      const likeFn = (post.is_liked === true) ? unlikePost : likePost;
       likeBtn.title = post.is_liked === true ? 'Unlike' : 'Like';
       likeBtn.classList.toggle('active', post.is_liked === true);
       likeBtn.onclick = function () {
-        likeFn(this.dataset.postid)
-        .then(resPost => {
-          removeAlert();
-          postCard.replaceWith(postCardDiv(resPost));
-        })
-        .catch(err => makeAlert(err.error));
-      }
+        postLike(this.dataset.postid, !post.is_liked)
+          .then(resPost => {
+            removeAlert();
+            postCard.replaceWith(postCardDiv(resPost));
+          })
+          .catch(err => makeAlert(err.error));
+      };
     }
 
     postCard.querySelector('.likes-count').innerHTML = post.likes_count;
@@ -233,7 +240,7 @@ function makeEditForm(postDiv) {
 
 function saveNewPost(contents) {
   return new Promise((resolve, reject) => {
-    fetch(`/api/posts/new/`, {
+    fetch(`/api/posts`, {
       method: 'POST',
       headers: { 'X-CSRFToken': csrftoken },
       mode: 'same-origin', // Do not send CSRF token to another domain.
@@ -256,7 +263,7 @@ function saveNewPost(contents) {
 
 function saveEditedPost(post_id, contents) {
   return new Promise((resolve, reject) => {
-    fetch(`/api/posts/${post_id}/edit/`, {
+    fetch(`/api/posts/${post_id}`, {
       method: 'PUT',
       headers: { 'X-CSRFToken': csrftoken },
       mode: 'same-origin', // Do not send CSRF token to another domain.
@@ -277,11 +284,10 @@ function saveEditedPost(post_id, contents) {
   });
 }
 
-
-function likePost(post_id) {
+function postLike(post_id, set_liked = true) {
   return new Promise((resolve, reject) => {
-    fetch(`/api/posts/${post_id}/like/`, {
-      method: 'POST',
+    fetch(`/api/posts/${post_id}/like`, {
+      method: set_liked ? 'POST' : 'DELETE',
       headers: { 'X-CSRFToken': csrftoken },
       mode: 'same-origin',
     })
@@ -298,50 +304,10 @@ function likePost(post_id) {
   });
 }
 
-function unlikePost(post_id) {
+function userFollow(user_id, set_following = true) {
   return new Promise((resolve, reject) => {
-    fetch(`/api/posts/${post_id}/unlike/`, {
-      method: 'POST',
-      headers: { 'X-CSRFToken': csrftoken },
-      mode: 'same-origin',
-    })
-      .then(response => response.json())
-      .then(result => {
-        console.log(result);
-        if (result.error != undefined) {
-          reject(result);
-        } else {
-          resolve(result);
-        }
-      })
-      .catch(err => reject({ error: err }));
-  });
-}
-
-function followUser(user_id) {
-  return new Promise((resolve, reject) => {
-    fetch(`/api/user/${user_id}/follow/`, {
-      method: 'POST',
-      headers: { 'X-CSRFToken': csrftoken },
-      mode: 'same-origin',
-    })
-      .then(response => response.json())
-      .then(result => {
-        console.log(result);
-        if (result.error != undefined) {
-          reject(result);
-        } else {
-          resolve(result);
-        }
-      })
-      .catch(err => reject({ error: err }));
-  });
-}
-
-function unfollowUser(user_id) {
-  return new Promise((resolve, reject) => {
-    fetch(`/api/user/${user_id}/unfollow/`, {
-      method: 'POST',
+    fetch(`/api/users/${user_id}/follow`, {
+      method: set_following ? 'POST' : 'DELETE',
       headers: { 'X-CSRFToken': csrftoken },
       mode: 'same-origin',
     })

@@ -1,6 +1,5 @@
         document.addEventListener('DOMContentLoaded', () => {
         p = getPageNumber();
-        apiRoute = 'following/'
-        
+        apiPostsFilter = {feed_only: true};
         showPage(p);
         });
