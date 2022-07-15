@@ -122,7 +122,7 @@ function postCardDiv(post = null) {
   } else {
     postCard.dataset['postid'] = post.post_id;
     postCard.querySelector('.author-link').innerHTML = post.author.username;
-    postCard.querySelector('.author-link').setAttribute('href', `/user/${post.author.user_id}`);
+    postCard.querySelector('.author-link').setAttribute('href', `/u/${post.author.username}`);
     postCard.querySelector('.post-contents').innerHTML = post.contents;
     postCard.querySelector('.post-timestamp').innerHTML = post.timestamp;
 

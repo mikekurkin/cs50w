@@ -19,7 +19,14 @@ def following(request):
 
 def user_view(request, user_id):
     user = get_object_or_404(User, id=user_id)
-    return render(request, "network/user_view.html", user.serialize(verbose=True, requester=request.user))
+    return HttpResponseRedirect(reverse(username_view, args=[user.username]))
+
+
+def username_view(request, username):
+    user = get_object_or_404(User, username__iexact=username)
+    if user.username != username:
+        return HttpResponseRedirect(reverse(username_view, args=[user.username]))
+    return render(request, "network/user_view.html", user.serialize(requester=request.user))
 
 
 def login_view(request):
