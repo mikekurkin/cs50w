@@ -11,12 +11,12 @@ class User(AbstractUser):
         through_fields=("follows", "follower"),
         related_name="following")
 
-    def serialize(self, verbose=False, requester=None):
+    def serialize(self, short=False, requester=None):
         res = {
             "user_id": self.pk,
             "username": self.username,
         }
-        if verbose:
+        if not short:
             res.update({
                 "last_login": humanize_timestamp(self.last_login),
                 "posts_count": self.posts.count(),
@@ -45,7 +45,7 @@ class Post(models.Model):
     def serialize(self, requester=None):
         res = {
             "post_id": self.pk,
-            "author": self.author.serialize(),
+            "author": self.author.serialize(short=True),
             "contents": self.contents,
             "timestamp": humanize_timestamp(self.timestamp),
             "likes_count": self.liked_by.distinct().count(),

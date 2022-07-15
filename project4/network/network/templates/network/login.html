@@ -11,6 +11,9 @@
 
     <form action="{% url 'login' %}" method="post">
         {% csrf_token %}
+        {% if request.GET.next is not None %}
+        <input type="hidden" name="next" value="{{ request.GET.next }}">
+        {% endif %}
         <div class="form-group">
             <input autofocus class="form-control" type="text" name="username" placeholder="Username">
         </div>

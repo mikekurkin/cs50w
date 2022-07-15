@@ -59,7 +59,7 @@ def api_user_read(request, user_id):
     except User.DoesNotExist as e:
         return JsonResponse({"error": str(e)}, status=404)
 
-    user_info = user.serialize(verbose=True, requester=request.user)
+    user_info = user.serialize(requester=request.user)
 
     return JsonResponse(user_info)
 
@@ -140,6 +140,6 @@ def api_follow(request, user_id):
 
     user.save()
 
-    user_info = user.serialize(verbose=True, requester=request.user)
+    user_info = user.serialize(requester=request.user)
 
     return JsonResponse(user_info)

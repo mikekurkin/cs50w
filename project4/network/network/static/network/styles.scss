@@ -119,7 +119,7 @@
                 &::before {@include far("\f004");}
                 &.active::before {@include fas("\f004");}
 
-                &:hover::before, 
+                &:hover:not(:disabled)::before, 
                 &.active::before {
                     color: red;
                 }}

@@ -40,7 +40,8 @@ def login_view(request):
         # Check if authentication successful
         if user is not None:
             login(request, user)
-            return HttpResponseRedirect(reverse("index"))
+            nextPath = request.POST.get("next", reverse("index"))
+            return HttpResponseRedirect(nextPath)
         else:
             return render(request, "network/login.html", {
                 "message": "Invalid username and/or password."
