@@ -7,9 +7,7 @@ var apiPostsFilter = {};
 function getPageNumber() {
   const urlParams = new URLSearchParams(window.location.search);
   let p = 1;
-  if (urlParams.has('p')) {
-    p = parseInt(urlParams.get('p'));
-  }
+  if (urlParams.has('p')) p = parseInt(urlParams.get('p'));
   return p;
 }
 
@@ -36,13 +34,18 @@ function showPage(p) {
         removeAlert();
         updatePosts(result.posts);
       }
-      makePaginator(result.pages, p);
+      showPaginator(result.pages, result.page);
     });
 }
 
 function updatePosts(posts) {
   const postsWrapper = document.querySelector('#posts-wrapper');
-  postsWrapper.replaceChildren(...posts.map(post => postCardDiv(post)));
+  if (posts.length > 0) {
+    postsWrapper.replaceChildren(...posts.map(post => postCardDiv(post)));
+    document.querySelector('.empty').innerHTML = '';
+  } else {
+    document.querySelector('.empty').innerHTML = 'No posts here';
+  }
 }
 
 function makeAlert(message) {
@@ -66,63 +69,45 @@ function removeAlert() {
   }
 }
 
-function makePaginator(total, current) {
+function showPaginator(total, current) {
   if (total <= 1) return;
-  const pagNav = document.createElement('nav');
-  pagNav.id = 'paginator';
-  const pagUl = document.createElement('ul');
-  pagNav.appendChild(pagUl);
-  pagUl.classList.add('pagination');
-  pagUl.classList.add('justify-content-center');
+  const paginatorTemplate = document.querySelector('#paginator-template');
+  const paginatorNav = paginatorTemplate.content.firstElementChild.cloneNode(true);
+  const prev = paginatorNav.querySelector('.prev-item');
+  const num = paginatorNav.querySelector('.num-item');
+  const next = paginatorNav.querySelector('.next-item');
 
-  const prevLi = document.createElement('li');
-  prevLi.classList.add('page-item');
-  if (current === 1) {
-    prevLi.classList.add('disabled');
-    prevLi.innerHTML = `<a class="page-link" href="#">&laquo;</a>`;
-  } else {
-    prevLi.innerHTML = `<a class="page-link" href="?p=${current - 1}">&laquo;</a>`;
-    prevLi.addEventListener('click', e => {
-      e.preventDefault();
-      goToPage(current - 1);
-    });
+  let nums = new Array(total);
+  for (let i = 0; i < total; i++) {
+    const item = num.cloneNode(true);
+    item.dataset.pagenum = i + 1;
+    item.querySelector('a').innerHTML = i + 1;
+    nums[i] = item;
   }
-  pagUl.appendChild(prevLi);
+  prev.dataset.pagenum = current - 1;
+  next.dataset.pagenum = current + 1;
 
-  for (var i = 1; i <= total; i++) {
-    const page = i;
-    const pageLi = document.createElement('li');
-    pageLi.classList.add('page-item');
-    if (current === page) {
-      pageLi.classList.add('active');
+  paginatorNav.querySelector('.pagination').replaceChildren(prev, ...nums, next);
+
+  paginatorNav.querySelectorAll('[data-pagenum]').forEach(item => {
+    const p = parseInt(item.dataset.pagenum);
+    item.classList.toggle('disabled', p <= 0 || p > total);
+    item.classList.toggle('active', p === current);
+    if (!item.classList.contains('disabled')) {
+      item.querySelector('a').setAttribute('href', `?p=${p}`);
+      item.onclick = function (e) {
+        e.preventDefault();
+        goToPage(parseInt(this.dataset.pagenum));
+      };
     }
-    pageLi.innerHTML = `<a class="page-link" href="?p=${page}">${page}</a>`;
-    pageLi.addEventListener('click', e => {
-      e.preventDefault();
-      goToPage(page);
-    });
-    pagUl.appendChild(pageLi);
-  }
-
-  const nextLi = document.createElement('li');
-  nextLi.classList.add('page-item');
-  if (current === total) {
-    nextLi.classList.add('disabled');
-    nextLi.innerHTML = `<a class="page-link" href="#">&raquo;</a>`;
-  } else {
-    nextLi.innerHTML = `<a class="page-link" href="?p=${current + 1}">&raquo;</a>`;
-    nextLi.addEventListener('click', e => {
-      e.preventDefault();
-      goToPage(current + 1);
-    });
-  }
-  pagUl.appendChild(nextLi);
+  });
 
   const paginator = document.querySelector('#paginator');
   if (paginator != null) {
-    paginator.replaceWith(pagNav);
+    paginator.replaceWith(paginatorNav);
+  } else {
+    document.querySelector('#pages').appendChild(paginatorNav);
   }
-  document.querySelector('#pages').appendChild(pagNav);
 }
 
 function postCardDiv(post = null) {

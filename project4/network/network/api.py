@@ -15,7 +15,7 @@ def api_posts(request):
 
 @api_method_required("GET")
 def api_posts_read(request):
-    page_n = request.GET.get('p', 1)
+    page_n = int(request.GET.get('p', 1))
     author_id = request.GET.get('author_id')
     feed_only = request.GET.get('feed_only')
 
@@ -28,7 +28,7 @@ def api_posts_read(request):
             return JsonResponse({"error": "Must be authenticated."}, status=403)
         page = get_posts_page(Post.objects.filter(author__in=request.user.following.all()),
                               page_n, requester=request.user)
-                              
+
     else:
         page = get_posts_page(Post.objects.all(),
                               page_n, requester=request.user)

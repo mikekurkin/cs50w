@@ -8,16 +8,17 @@ from datetime import datetime, timedelta, timezone
 
 def get_posts_page(posts, page, requester=None):
     p = paginator.Paginator(posts, PER_PAGE)
+    res = {
+        "pages": p.num_pages,
+        "page": page,
+    }
     try:
-        return {
-            "pages": p.num_pages,
-            "posts": [post.serialize(requester=requester) for post in p.page(page).object_list],
-        }
+        res["posts"] = [post.serialize(requester=requester)
+                        for post in p.page(page).object_list]
     except paginator.EmptyPage as e:
-        return {
-            "pages": p.num_pages,
-            "error": str(e),
-        }
+        res["error"] = str(e)
+
+    return res
 
 
 def api_login_required(func):

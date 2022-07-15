@@ -6,6 +6,7 @@
 {% block scripts %}
   <script src="{% static 'network/user_view.js' %}"></script>
   {% include "network/post_template.html" %}
+  {% include "network/paginator_template.html" %}
 {% endblock %}
 
 {% block body %}
@@ -29,13 +30,13 @@
       <div id="posts-count" class="card">
         <div class="card-body">
           <h3 class="card-title">{{ posts_count }}</h3>
-          <small class="card-text">posts</small>
+          <small class="card-text">post{{ posts_count | pluralize }}</small>
         </div>
       </div>
       <div id="followers-count" class="card">
         <div class="card-body">
           <h3 class="card-title">{{ followers_count }}</h3>
-          <small class="card-text">followers</small>
+          <small class="card-text">follower{{ followers_count | pluralize }}</small>
         </div>
       </div>
       <div id="following-count" class="card">
@@ -46,6 +47,9 @@
       </div>
     </div>
   </div>
-  <div id="posts" class=""><div id="posts-wrapper"></div></div>
+  <div id="posts" class="">
+    <div id="posts-wrapper"></div>
+    <div class="empty"></div>
+  </div>
   <div id="pages"></div>
 {% endblock %}

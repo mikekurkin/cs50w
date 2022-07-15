@@ -6,6 +6,7 @@
 {% block scripts %}
     <script src="{% static 'network/following.js' %}"></script>
     {% include "network/post_template.html" %}
+    {% include "network/paginator_template.html" %}
 {% endblock %}
 
 {% block body %}
@@ -14,6 +15,7 @@
             <div class="col"><h2 id="heading">Your Feed</h2></div>
         </div>
         <div id="posts-wrapper"></div>
+        <div class="empty"></div>
     </div>
     <div id="pages"></div>
 {% endblock %}

@@ -182,6 +182,12 @@
     &.active span::after  {@include far('\f106');}
 }
 
+.empty {
+    @extend .h6;
+    font-style: italic;
+    text-align: center;
+}
+
 
 .pagination {
     .page-link {color: dimgrey;}
@@ -190,16 +196,4 @@
         border-color: grey;
         background: #aaa;
     }
-}
-
-.text-secondary {
-    color: #6c757d !important;
-  }
-  
-a.text-secondary:hover, a.text-secondary:focus {
-    color: #494f54 !important;
-}
-
-.text-muted {
-    color: #6c757d !important;
 }

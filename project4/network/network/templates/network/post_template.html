@@ -1,27 +1,27 @@
 <template id="post-template">
-    <div class="post-card card" data-postid>
-      <div class="card-header row">
-        <div class="col">
-          <h5 class="card-title text-dark"><a class="author-link text-secondary text-decoration-none" href="#"></a></h5>
-        </div>
-        <div class="col edit-wrapper" hidden>
-          <button title="Edit Post" class="edit-btn btn btn-link btn-sm text-secondary"></button>
-          <button title="Cancel Editing" class="cancel-btn btn btn-link btn-sm text-secondary" hidden></button>
-        </div>
-        <div class="col">
-          <small class="post-timestamp"></small>
-        </div>
+  <div class="post-card card" data-postid>
+    <div class="card-header row">
+      <div class="col">
+        <h5 class="card-title text-dark"><a class="author-link text-secondary text-decoration-none" href="#"></a></h5>
       </div>
-      <div class="card-body">
-        <p class="post-contents"></p>
-        <div class="post-footer row">
-          <div class="col-auto">
-          <button title="Like" class="like-btn btn btn-sm btn-light" hidden><span class="likes-count"></span></button>
-        </div>
-        <div class="col-auto ml-auto">
-          <button class="save-btn btn btn-sm btn-primary" hidden>Save</button>
-        </div>
-        </div>
+      <div class="col edit-wrapper" hidden>
+        <button title="Edit Post" class="edit-btn btn btn-link btn-sm text-secondary"></button>
+        <button title="Cancel Editing" class="cancel-btn btn btn-link btn-sm text-secondary" hidden></button>
+      </div>
+      <div class="col">
+        <small class="post-timestamp"></small>
       </div>
     </div>
-  </template>
+    <div class="card-body">
+      <p class="post-contents"></p>
+      <div class="post-footer row">
+        <div class="col-auto">
+        <button title="Like" class="like-btn btn btn-sm btn-light" hidden><span class="likes-count"></span></button>
+      </div>
+      <div class="col-auto ml-auto">
+        <button class="save-btn btn btn-sm btn-primary" hidden>Save</button>
+      </div>
+      </div>
+    </div>
+  </div>
+</template>
