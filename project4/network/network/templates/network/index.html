@@ -14,14 +14,13 @@
       <div class="col"><h2 id="heading">All Posts</h2></div>
       {% if user.is_authenticated %}
         <div class="col">
-          <button id="new-btn" title="New Post">
+          <button id="new-btn" class="new-btn btn btn-outline-secondary" title="New Post">
             <span>New</span>
           </button>
         </div>
       {% endif %}
     </div>
-    <div id="posts-wrapper">
-    </div>
+    <div id="posts-wrapper"></div>
   </div>
   <div id="pages"></div>
 {% endblock %}

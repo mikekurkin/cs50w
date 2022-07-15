@@ -9,8 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
     newPostBtn.addEventListener('click', e => {
       e.preventDefault();
       const newPostCard = document.querySelector('#new-post');
-      
-      newPostBtn.classList.toggle('active', newPostCard === null)
+      newPostBtn.classList.toggle('active', newPostCard === null);
 
       if (newPostCard !== null) {
         newPostCard.remove();

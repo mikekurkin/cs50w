@@ -1,7 +1,7 @@
 {% extends "network/layout.html" %}
 {% load static %}
 
-{% comment %} {% block following-active %}active{% endblock %} {% endcomment %}
+{% block user-active %}{% if user.id == user_id %}active{% endif %}{% endblock %}
 
 {% block scripts %}
   <script src="{% static 'network/user_view.js' %}"></script>
@@ -17,9 +17,8 @@
             <h1 id="username" data-userid="{{ user_id }}">{{ username }}</h1>
           </div>
           <div id="follow" class="col">
-            {% if user.is_authenticated %}
-            {% comment %} {% if user.is_authenticated and user.id != user_id %} {% endcomment %}
-            <button class="follow-btn{% if is_following %} active{% endif %}"></button>
+            {% if user.is_authenticated and user.id != user_id %}
+            <button class="follow-btn btn btn-lg btn-link{% if is_following %} active{% endif %}"></button>
             {% endif %}
           </div>
         </div>
@@ -45,9 +44,8 @@
           <small class="card-text">following</small>
         </div>
       </div>
-    
     </div>
   </div>
-  <div id="posts" class=""></div>
+  <div id="posts" class=""><div id="posts-wrapper"></div></div>
   <div id="pages"></div>
 {% endblock %}

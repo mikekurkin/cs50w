@@ -1,5 +1,7 @@
 @import '../../../bootstrap/scss/bootstrap';
-@import url('//cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css');
+
+@font-face{font-family:"Font Awesome 6 Free";font-style:normal;font-weight:400;font-display:block;src:url(//cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/webfonts/fa-regular-400.woff2) format("woff2"),url(//cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/webfonts/fa-regular-400.ttf) format("truetype")}
+@font-face{font-family:"Font Awesome 6 Free";font-style:normal;font-weight:900;font-display:block;src:url(//cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/webfonts/fa-solid-900.woff2) format("woff2"),url(//cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/webfonts/fa-solid-900.ttf) format("truetype")}
 
 @media only screen {
     .container {
@@ -11,7 +13,7 @@
     display: inline-block;
     text-rendering: auto;
     -webkit-font-smoothing: antialiased;
-    font: var(--fa-font-regular);
+    font: normal 400 1em/1 "Font Awesome 6 Free";
     content: $content;
 }
 
@@ -19,7 +21,7 @@
     display: inline-block;
     text-rendering: auto;
     -webkit-font-smoothing: antialiased;
-    font: var(--fa-font-solid);
+    font: normal 900 1em/1 "Font Awesome 6 Free";
     content: $content;
 }
 
@@ -40,10 +42,14 @@
     }
     
     .card {
-        @extend .col, .px-1, .mx-1, .text-center;
+        @extend .col, .px-1, .mx-1;
+        text-align: center;
         .card-body {
             @extend .p-2;
-            .card-title {@extend .font-weight-bold, .m-0;}
+            .card-title {
+                @extend .m-0;
+                font-weight: bold;
+            }
         }
     }
     
@@ -67,12 +73,13 @@
         }
 
         .btn {
-            @extend .btn-link, .btn-sm, .text-secondary, .py-0, .px-2, .m-0;
+            @extend .py-0, .px-2, .m-0;
             opacity: 60%;
             &:hover {
                 opacity: 75%;
             }
         }
+        .card-title {@extend .my-0;}
 
         .edit-btn::before {@include fas("\f303");}
 
@@ -80,12 +87,13 @@
     }
 
     .post-timestamp {
-        @extend .text-muted, .font-italic;
+        @extend .text-muted;
+        font-style: italic;
     }
 
     .card-body {
         .post-contents {
-            @extend .card-text, .mt-n1, .mx-n1, .mb-2, .p-1;
+            @extend .mt-n1, .mx-n1, .mb-2, .p-1;
 
             white-space: pre-wrap;
     
@@ -103,12 +111,10 @@
         .post-footer {
             @extend .justify-content-between, .align-items-baseline, .mt-3;
 
-            .btn {@extend .btn-sm, .py-1, .px-2;}
+            .btn {@extend .py-1, .px-2;}
 
-            .save-btn {@extend .btn-primary;}
 
             .like-btn {
-                @extend .btn-light;
 
                 &::before {@include far("\f004");}
                 &.active::before {@include fas("\f004");}
@@ -126,7 +132,8 @@
 
 
 .follow-btn {
-    @extend .btn, .btn-link, .text-decoration-none, .btn-lg, .py-1, .px-0;
+    @extend .py-1, .px-0;
+    text-decoration: none;
     &::before {@include far("\f005");}
     &.active::before {@include fas("\f005");}
     
@@ -155,10 +162,13 @@
 }
 
 #new-btn {
-    @extend .px-1, .btn, .btn-outline-secondary;
+    @extend .px-1;
     
     span {
-        @extend .h5;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+        line-height: 1.2;
+        font-size: 1.25rem;
         
         &::before,
         &::after {
@@ -182,3 +192,14 @@
     }
 }
 
+.text-secondary {
+    color: #6c757d !important;
+  }
+  
+a.text-secondary:hover, a.text-secondary:focus {
+    color: #494f54 !important;
+}
+
+.text-muted {
+    color: #6c757d !important;
+}

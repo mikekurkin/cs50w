@@ -26,26 +26,15 @@ function showPage(p) {
         makeAlert(result.error);
       } else {
         removeAlert();
-        makePostsWrapper(result.posts);
+        updatePosts(result.posts);
       }
       makePaginator(result.pages, p);
     });
 }
 
-function makePostsWrapper(posts) {
-  const postsWrapperDiv = document.createElement('div');
-  postsWrapperDiv.id = 'posts-wrapper';
-
-  Array.from(posts).forEach(post => {
-    postsWrapperDiv.appendChild(postCardDiv(post));
-  });
-
+function updatePosts(posts) {
   const postsWrapper = document.querySelector('#posts-wrapper');
-  if (postsWrapper != null) {
-    postsWrapper.replaceWith(postsWrapperDiv);
-  } else {
-    document.querySelector('#posts').appendChild(postsWrapperDiv);
-  }
+  postsWrapper.replaceChildren(...posts.map(post => postCardDiv(post)));
 }
 
 function makeAlert(message) {
@@ -78,7 +67,7 @@ function makePaginator(total, current) {
   pagUl.classList.add('pagination');
   pagUl.classList.add('justify-content-center');
 
-  prevLi = document.createElement('li');
+  const prevLi = document.createElement('li');
   prevLi.classList.add('page-item');
   if (current === 1) {
     prevLi.classList.add('disabled');
@@ -94,7 +83,7 @@ function makePaginator(total, current) {
 
   for (var i = 1; i <= total; i++) {
     const page = i;
-    pageLi = document.createElement('li');
+    const pageLi = document.createElement('li');
     pageLi.classList.add('page-item');
     if (current === page) {
       pageLi.classList.add('active');
@@ -107,7 +96,7 @@ function makePaginator(total, current) {
     pagUl.appendChild(pageLi);
   }
 
-  nextLi = document.createElement('li');
+  const nextLi = document.createElement('li');
   nextLi.classList.add('page-item');
   if (current === total) {
     nextLi.classList.add('disabled');
@@ -131,32 +120,27 @@ function makePaginator(total, current) {
 function postCardDiv(post = null) {
   const postTemplate = document.querySelector('#post-template');
   const postCard = postTemplate.content.firstElementChild.cloneNode(true);
-  
+
   postCard.id = post !== null ? `post${post.post_id}` : 'new-post';
 
   if (post === null) {
-    postCard.querySelector('.card-title')
-      .innerHTML = "New Post";
-    postCard.querySelector('.post-timestamp')
-      .innerHTML = "now";
+    postCard.querySelector('.card-title').innerHTML = 'New Post';
+    postCard.querySelector('.post-timestamp').innerHTML = 'now';
   } else {
     postCard.dataset['postid'] = post.post_id;
-    postCard.querySelector('.author-link')
-      .innerHTML = post.author.username;
-    postCard.querySelector('.author-link')
-      .setAttribute('href', `/user/${post.author.user_id}/`);
-    postCard.querySelector('.post-contents')
-      .innerHTML = post.contents;
-    postCard.querySelector('.post-timestamp')
-      .innerHTML = post.timestamp;
+    postCard.querySelector('.author-link').innerHTML = post.author.username;
+    postCard.querySelector('.author-link').setAttribute('href', `/user/${post.author.user_id}`);
+    postCard.querySelector('.post-contents').innerHTML = post.contents;
+    postCard.querySelector('.post-timestamp').innerHTML = post.timestamp;
 
     const likeBtn = postCard.querySelector('.like-btn');
     likeBtn.dataset.postid = post.post_id;
-    if (post.is_liked === null) {
-        likeBtn.setAttribute('disabled', 'true');
-    } else {
-      likeBtn.title = (post.is_liked === true) ? 'Unlike' : 'Like';
+    likeBtn.toggleAttribute('hidden', post === null);
+    likeBtn.toggleAttribute('disabled', post.is_liked === null);
+
+    if (post.is_liked !== null) {
       const likeFn = (post.is_liked === true) ? unlikePost : likePost;
+      likeBtn.title = post.is_liked === true ? 'Unlike' : 'Like';
       likeBtn.classList.toggle('active', post.is_liked === true);
       likeBtn.onclick = function () {
         likeFn(this.dataset.postid)
@@ -168,19 +152,15 @@ function postCardDiv(post = null) {
       }
     }
 
-    postCard.querySelector('.likes-count')
-      .innerHTML = post.likes_count;
-    postCard.querySelector('.likes-count')
-      .toggleAttribute('hidden', post.likes_count === 0);
-    
-    postCard.querySelector('.edit-wrapper')
-      .toggleAttribute('hidden', !post.can_edit);
-    
+    postCard.querySelector('.likes-count').innerHTML = post.likes_count;
+    postCard.querySelector('.likes-count').toggleAttribute('hidden', post.likes_count === 0);
+
+    postCard.querySelector('.edit-wrapper').toggleAttribute('hidden', !post.can_edit);
+
     if (post.can_edit) {
-      postCard.querySelector('.edit-btn')
-        .onclick = () => {
+      postCard.querySelector('.edit-btn').onclick = () => {
         makeEditForm(postCard);
-      }
+      };
     }
   }
 
@@ -188,8 +168,8 @@ function postCardDiv(post = null) {
 }
 
 function makeEditForm(postDiv) {
-  const newPost = (postDiv.id === 'new-post');
-  
+  const newPost = postDiv.id === 'new-post';
+
   const postContents = postDiv.querySelector('.post-contents');
   const contentsBefore = postContents.innerHTML;
 
@@ -198,7 +178,7 @@ function makeEditForm(postDiv) {
   const saveButton = postDiv.querySelector('.save-btn');
 
   cancelButton.onclick = cancelEditing;
- 
+
   saveButton.innerHTML = newPost ? 'Post' : 'Save';
   saveButton.onclick = finishEditing;
   postContents.setAttribute('contentEditable', 'plaintext-only');
@@ -208,7 +188,7 @@ function makeEditForm(postDiv) {
     cancelButton.removeAttribute('hidden');
   }
   saveButton.removeAttribute('hidden');
-  
+
   postDiv.querySelector('.post-contents').focus();
 
   return postDiv;
@@ -237,7 +217,7 @@ function makeEditForm(postDiv) {
       }
     } else {
       if (contents === contentsBefore) {
-        cancelEditing()
+        cancelEditing();
       } else {
         const post_id = parseInt(postDiv.dataset['postid']);
         saveEditedPost(post_id, contents)
