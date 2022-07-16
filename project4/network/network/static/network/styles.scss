@@ -176,10 +176,10 @@
         }
         
         &::before {@include far('\f044');}
-        &::after {@include far('\f107');}
+        &::after {@include fas('\f107');}
     }
     
-    &.active span::after  {@include far('\f106');}
+    &.active span::after  {@include fas('\f106');}
 }
 
 .empty {

@@ -124,7 +124,8 @@ function postCardDiv(post = null) {
     postCard.querySelector('.author-link').innerHTML = post.author.username;
     postCard.querySelector('.author-link').setAttribute('href', `/u/${post.author.username}`);
     postCard.querySelector('.post-contents').innerHTML = post.contents;
-    postCard.querySelector('.post-timestamp').innerHTML = post.timestamp;
+    postCard.querySelector('.post-timestamp').innerHTML = post.timestamp.humanized;
+    postCard.querySelector('.post-timestamp').setAttribute('title', post.timestamp.exact);
 
     const likeBtn = postCard.querySelector('.like-btn');
     likeBtn.dataset.postid = post.post_id;

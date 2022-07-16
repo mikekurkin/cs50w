@@ -23,7 +23,8 @@ function showUserInfo(user) {
   document.querySelector('#followers-count .card-title').innerHTML = user.followers_count;
   document.querySelector('#followers-count .card-text').innerHTML = `follower${user.followers_count !== 1 ? 's' : ''}`;
   document.querySelector('#following-count .card-title').innerHTML = user.following_count;
-  document.querySelector('#last-seen').innerHTML = user.last_login;
+  document.querySelector('#last-seen').innerHTML = user.last_login.humanized;
+  document.querySelector('#last-seen').setAttribute('title', user.last_login.exact);
 
   let followBtn = document.querySelector('.follow-btn');
   if (followBtn !== null) {

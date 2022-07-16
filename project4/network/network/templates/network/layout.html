@@ -4,10 +4,10 @@
 <html lang="en">
     <head>
         <title>{% block title %}Social Network{% endblock %}</title>
-        {% comment %} <script src="https://kit.fontawesome.com/1b0347c490.js" crossorigin="anonymous"></script> {% endcomment %}
-        {% comment %} <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous"> {% endcomment %}
-        <script src="{% static 'network/network.js' %}"></script>
         <link href="{% static 'network/styles.css' %}" rel="stylesheet">
+        {% comment %} <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous"> {% endcomment %}
+        {% comment %} <script src="https://kit.fontawesome.com/1b0347c490.js" crossorigin="anonymous"></script> {% endcomment %}
+        <script src="{% static 'network/network.js' %}"></script>
         {% block scripts %}
         {% endblock %}
     </head>

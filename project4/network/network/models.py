@@ -18,7 +18,10 @@ class User(AbstractUser):
         }
         if not short:
             res.update({
-                "last_login": humanize_timestamp(self.last_login),
+                "last_login": {
+                    "humanized": humanize_timestamp(self.last_login),
+                    "exact": self.last_login.strftime("%d %b %Y, %H:%M"),
+                },
                 "posts_count": self.posts.count(),
                 "followers_count": self.followers.count(),
                 "following_count": self.following.count(),
@@ -47,7 +50,10 @@ class Post(models.Model):
             "post_id": self.pk,
             "author": self.author.serialize(short=True),
             "contents": self.contents,
-            "timestamp": humanize_timestamp(self.timestamp),
+            "timestamp": {
+                "humanized": humanize_timestamp(self.timestamp),
+                "exact": self.timestamp.strftime("%d %b %Y, %H:%M"),
+            },
             "likes_count": self.liked_by.distinct().count(),
         }
         if requester is not None:
