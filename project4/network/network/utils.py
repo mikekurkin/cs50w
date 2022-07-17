@@ -4,6 +4,7 @@ from django.core import paginator
 from django.http import JsonResponse
 from humanize import naturaldate, naturaltime
 
+PER_PAGE = 10
 
 
 def get_posts_page(posts, page, requester=None):

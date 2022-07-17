@@ -47,6 +47,9 @@ class Post(models.Model):
         related_name="liked_posts",
         editable=True)
 
+    def __str__(self):
+        return(f'Post #{self.id} by {self.author.username}')
+
     def serialize(self, requester=None):
         """returns serialized post info"""
         res = {
