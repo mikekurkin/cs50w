@@ -12,6 +12,7 @@ class User(AbstractUser):
         related_name="following")
 
     def serialize(self, short=False, requester=None):
+        """Returns serialized user info"""
         res = {
             "user_id": self.pk,
             "username": self.username,
@@ -36,7 +37,8 @@ class User(AbstractUser):
 
 
 class Post(models.Model):
-    author = models.ForeignKey("User", on_delete=models.PROTECT, related_name="posts")
+    author = models.ForeignKey(
+        "User", on_delete=models.PROTECT, related_name="posts")
     contents = models.TextField(max_length=1000)
     timestamp = models.DateTimeField(auto_now_add=True)
     liked_by = models.ManyToManyField(
@@ -46,6 +48,7 @@ class Post(models.Model):
         editable=True)
 
     def serialize(self, requester=None):
+        """returns serialized post info"""
         res = {
             "post_id": self.pk,
             "author": self.author.serialize(short=True),
@@ -67,16 +70,21 @@ class Post(models.Model):
         return res
 
     class Meta:
+        # Reverse chronological order
         ordering = ['-timestamp']
 
 
 class FollowRelationship(models.Model):
-    follower = models.ForeignKey("User", on_delete=models.CASCADE, related_name="following_relationships")
-    follows = models.ForeignKey("User", on_delete=models.CASCADE, related_name="follows_relationships")
+    follower = models.ForeignKey(
+        "User", on_delete=models.CASCADE, related_name="following_relationships")
+    follows = models.ForeignKey(
+        "User", on_delete=models.CASCADE, related_name="follows_relationships")
     timestamp = models.DateTimeField(auto_now_add=True)
 
 
 class Like(models.Model):
-    user = models.ForeignKey("User", on_delete=models.CASCADE, related_name="likes")
-    posts = models.ForeignKey("Post", on_delete=models.CASCADE, related_name="likes")
+    user = models.ForeignKey(
+        "User", on_delete=models.CASCADE, related_name="likes")
+    posts = models.ForeignKey(
+        "Post", on_delete=models.CASCADE, related_name="likes")
     timestamp = models.DateTimeField(auto_now_add=True)

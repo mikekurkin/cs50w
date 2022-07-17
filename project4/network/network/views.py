@@ -18,12 +18,16 @@ def following(request):
 
 
 def user_view(request, user_id):
+    # Try to find user by id
     user = get_object_or_404(User, id=user_id)
+    # Redirect to username-based url
     return HttpResponseRedirect(reverse(username_view, args=[user.username]))
 
 
 def username_view(request, username):
+    # Try to find user by username
     user = get_object_or_404(User, username__iexact=username)
+    # If username was not exact (i.e. wrong capitalization), redirect to correct
     if user.username != username:
         return HttpResponseRedirect(reverse(username_view, args=[user.username]))
     return render(request, "network/user_view.html", user.serialize(requester=request.user))
