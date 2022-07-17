@@ -29,16 +29,16 @@
     @extend .align-items-baseline, .justify-content-between, .mx-sm-4, .my-4;
     
     .col {
-        @extend .col-auto, .px-0;
+        @extend .col-auto, .px-0, .mx-4, .mx-sm-0;
     }
 }
 
 #user-header {
     @extend .align-items-baseline, .justify-content-between, .mx-sm-4, .my-4;
     
-    &> .col {
-        &:not(:last-child) {@extend .col-sm, .px-4, .px-sm-1, .py-3, .py-sm-2;}
-        &:last-child {@extend .col-sm-6, .row;}
+    > .col-sm {
+        @extend .px-4, .px-sm-1, .py-2, .py-sm-2;
+        &:last-child {@extend .col-sm-6, .row, .mx-3, .px-0;}
     }
     
     .card {
@@ -50,6 +50,7 @@
                 @extend .m-0;
                 font-weight: bold;
             }
+            .card-text {@extend .text-nowrap;}
         }
     }
     

@@ -11,7 +11,7 @@
 
 {% block body %}
   <div id="user-header" class="row">
-    <div class="col">
+    <div class="col-sm">
       <div>
         <div id="username-heading" class="row">
           <div class="col">
@@ -26,7 +26,7 @@
         <small class="text-muted font-italic">Last logged in <abbr id="last-seen" title="{{ last_login.exact }}">{{ last_login.humanized }}</abbr></small>
       </div>
     </div>
-    <div class="col">
+    <div class="col-sm">
       <div id="posts-count" class="card">
         <div class="card-body">
           <h3 class="card-title">{{ posts_count }}</h3>
